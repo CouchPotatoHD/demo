@@ -6,817 +6,213 @@
 <title>Developer Dashboard</title>
 <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;700;800&family=JetBrains+Mono:wght@400;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --bg: #0B1120;
-    --text: #fff;
-    --muted: rgba(255,255,255,0.4);
-    --muted2: rgba(255,255,255,0.15);
-    --card: rgba(255,255,255,0.06);
-    --border: rgba(255,255,255,0.1);
-    --green: #059669;
-    --yellow: #F59E0B;
-    --gray: #6B7280;
-    --red: #EF4444;
-    --purple: #818CF8;
-  }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { background: var(--bg); color: var(--text); font-family: 'JetBrains Mono', monospace; overflow: hidden; height: 100vh; }
+  :root{--bg:#0B1120;--text:#fff;--muted:rgba(255,255,255,0.4);--card:rgba(255,255,255,0.05);--border:rgba(255,255,255,0.08);--green:#059669;--yellow:#F59E0B;--gray:#6B7280;--red:#EF4444;--purple:#818CF8}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--text);font-family:'JetBrains Mono',monospace;overflow:hidden;height:100vh}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes shake{0%,100%{transform:translateX(0)}25%,75%{transform:translateX(-6px)}50%{transform:translateX(6px)}}
+  .anim{animation:fadeIn .45s ease both}.d1{animation-delay:.08s}.d2{animation-delay:.16s}
+  .dot-bg{position:absolute;inset:0;opacity:.03;pointer-events:none;background-image:radial-gradient(circle at 1px 1px,white 1px,transparent 0);background-size:32px 32px}
+  #lock{width:100%;height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;position:relative}
+  #lock input{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:10px 16px;color:#fff;font-size:15px;font-family:inherit;outline:none;width:200px}
+  #lock input.err{border-color:var(--red)}
+  #lock button{background:var(--green);border:none;border-radius:8px;color:#fff;padding:10px 20px;cursor:pointer;font-size:13px;font-family:inherit;font-weight:600}
+  #lock .shake{animation:shake .35s ease}
+  #loading{width:100%;height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;position:relative}
+  #lbw{width:120px;height:3px;background:rgba(255,255,255,0.1);border-radius:2px;overflow:hidden}
+  #lb{width:0%;height:100%;background:var(--green);border-radius:2px;transition:width .4s}
+  #app{display:none;flex-direction:column;height:100vh;width:100%;position:relative}
+  #app.on{display:flex}
+  .topbar{display:flex;justify-content:space-between;align-items:center;padding:10px 24px;border-bottom:1px solid rgba(255,255,255,0.06);position:relative;z-index:2}
+  .tl{display:flex;align-items:center;gap:10px}
+  .tl img{width:30px;height:30px;border-radius:8px;background:#1e293b;object-fit:cover}
+  .tl span{font-size:12px;color:var(--muted)}
+  .dots{display:flex;gap:6px;align-items:center}
+  .dot{width:8px;height:8px;border-radius:4px;border:none;background:rgba(255,255,255,0.15);cursor:pointer;padding:0;transition:all .25s}
+  .dot.active{width:22px}
+  .cnt{font-size:11px;color:rgba(255,255,255,0.25)}
+  .sa{flex:1;padding:18px 28px;overflow:hidden;position:relative;z-index:1}
+  .bb{display:flex;justify-content:space-between;align-items:center;padding:8px 24px;border-top:1px solid rgba(255,255,255,0.06);position:relative;z-index:2}
+  .nb{background:var(--card);border:1px solid var(--border);border-radius:8px;color:rgba(255,255,255,0.6);padding:7px 18px;cursor:pointer;font-size:12px;font-family:inherit;transition:all .2s}
+  .nb:disabled{color:rgba(255,255,255,0.15);cursor:default}
+  .nb.p{border:none;color:#fff;font-weight:600}
+  .nb.p:disabled{background:var(--card);color:rgba(255,255,255,0.15)}
 
-  @keyframes fadeSlideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-  @keyframes fadeIn { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
-  @keyframes shake { 0%,100% { transform: translateX(0); } 20%,60% { transform: translateX(-8px); } 40%,80% { transform: translateX(8px); } }
-  .anim { animation: fadeSlideUp 0.5s ease both; }
-  .d1 { animation-delay: 0.1s; } .d2 { animation-delay: 0.2s; } .d3 { animation-delay: 0.3s; } .d4 { animation-delay: 0.35s; } .d5 { animation-delay: 0.4s; }
+  /* Profile */
+  .prof{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:28px;text-align:center}
+  .prof img{width:100px;height:100px;border-radius:50%;border:3px solid rgba(255,255,255,0.15);background:#1e293b;object-fit:cover}
+  .prof h1{font-size:42px;font-weight:800;font-family:'Unbounded',sans-serif;letter-spacing:-1px}
+  .prof .sub{font-size:16px;color:var(--muted);margin-top:6px}
+  .prof .sts{display:flex;gap:48px;margin-top:12px}
+  .prof .sn{font-size:48px;font-weight:800;font-family:'Space Mono',monospace}
+  .prof .sl{font-size:12px;color:var(--muted);margin-top:2px}
 
-  .dot-bg {
-    position: absolute; inset: 0; opacity: 0.03; pointer-events: none;
-    background-image: radial-gradient(circle at 1px 1px, white 1px, transparent 0);
-    background-size: 32px 32px;
-  }
-
-  /* Lock screen */
-  #lock-screen {
-    width: 100%; height: 100vh; display: flex; flex-direction: column;
-    align-items: center; justify-content: center; gap: 24px; position: relative;
-  }
-  #lock-screen input {
-    background: var(--card); border: 1px solid var(--border); border-radius: 8px;
-    padding: 10px 16px; color: #fff; font-size: 15px; font-family: 'JetBrains Mono', monospace;
-    outline: none; width: 200px; transition: border-color 0.3s;
-  }
-  #lock-screen input.error { border-color: var(--red); }
-  #lock-screen button {
-    background: var(--green); border: none; border-radius: 8px; color: #fff;
-    padding: 10px 20px; cursor: pointer; font-size: 13px; font-family: 'JetBrains Mono', monospace; font-weight: 600;
-  }
-  #lock-screen .shake { animation: shake 0.4s ease; }
+  /* Combined project */
+  .pf{display:flex;flex-direction:column;height:100%;gap:8px;overflow:hidden}
+  .pf-h{display:flex;align-items:center;gap:14px;flex-shrink:0;flex-wrap:wrap}
+  .pf-bar{width:5px;height:30px;border-radius:3px;flex-shrink:0}
+  .pf-t{font-size:26px;font-weight:800;font-family:'Unbounded',sans-serif}
+  .pf-bg{display:flex;gap:14px;align-items:center;margin-left:auto}
+  .pf-b{display:flex;align-items:center;gap:5px;font-size:12px;font-weight:700;font-family:'Space Mono',monospace}
+  .pf-b i{width:7px;height:7px;border-radius:50%;display:inline-block}
+  .pf-bugs{font-size:10px;color:var(--muted)}
+  .pf-body{display:flex;gap:10px;flex:1;min-height:0;overflow:hidden}
+  .pf-col{flex:1;display:flex;flex-direction:column;gap:3px;min-width:0;overflow-y:auto;padding-right:4px}
+  .pf-col::-webkit-scrollbar{width:2px}
+  .pf-col::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.1);border-radius:2px}
+  .pf-ch{font-size:10px;font-weight:700;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:1.5px;padding-bottom:5px;border-bottom:1px solid var(--border);margin-bottom:2px;flex-shrink:0}
+  .pf-mr{display:flex;gap:6px;margin-bottom:4px}
+  .pf-m{background:var(--card);border-radius:8px;padding:8px 10px;text-align:center;flex:1}
+  .pf-mv{font-size:20px;font-weight:800;font-family:'Space Mono',monospace}
+  .pf-ml{font-size:8px;color:var(--muted);margin-top:1px}
+  .tr{display:flex;align-items:flex-start;gap:7px;padding:4px 7px;border-radius:6px;background:rgba(255,255,255,0.02)}
+  .tr-d{width:6px;height:6px;border-radius:50%;margin-top:5px;flex-shrink:0}
+  .tr-n{font-size:11px;color:rgba(255,255,255,0.8);line-height:1.3}
+  .tr-k{font-size:8px;color:rgba(255,255,255,0.22);margin-top:1px}
+  .pf-pt{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-top:6px;margin-bottom:4px;flex-shrink:0}
+  .pf-pi{font-size:10px;color:rgba(255,255,255,0.65);line-height:1.4;padding:2px 0;display:flex;gap:5px}
+  .pf-pn{font-weight:700;flex-shrink:0;width:14px;text-align:right}
 
   /* Dashboard */
-  #dashboard { display: none; flex-direction: column; height: 100vh; width: 100%; position: relative; }
-  #dashboard.active { display: flex; }
-
-  .topbar {
-    display: flex; justify-content: space-between; align-items: center;
-    padding: 10px 24px; border-bottom: 1px solid rgba(255,255,255,0.06); position: relative; z-index: 2;
-  }
-  .topbar-left { display: flex; align-items: center; gap: 12px; }
-  .topbar-left img { width: 32px; height: 32px; border-radius: 8px; background: #1e293b; }
-  .topbar-left span { font-size: 13px; color: var(--muted); }
-  .dots { display: flex; align-items: center; gap: 8px; }
-  .dot {
-    width: 8px; height: 8px; border-radius: 4px; border: none;
-    background: var(--muted2); cursor: pointer; padding: 0; transition: all 0.3s ease;
-  }
-  .dot.active { width: 24px; }
-  .slide-counter { font-size: 12px; color: rgba(255,255,255,0.3); }
-
-  .slide-area { flex: 1; padding: 24px 40px; overflow: hidden; position: relative; z-index: 1; }
-  .slide-area::-webkit-scrollbar { width: 4px; }
-  .slide-area::-webkit-scrollbar-thumb { background: var(--muted2); border-radius: 2px; }
-
-  .bottombar {
-    display: flex; justify-content: space-between; align-items: center;
-    padding: 10px 24px; border-top: 1px solid rgba(255,255,255,0.06); position: relative; z-index: 2;
-  }
-  .nav-btn {
-    background: var(--card); border: 1px solid var(--border); border-radius: 8px;
-    color: rgba(255,255,255,0.7); padding: 8px 20px; cursor: pointer; font-size: 13px;
-    font-family: 'JetBrains Mono', monospace; transition: all 0.2s;
-  }
-  .nav-btn:disabled { color: rgba(255,255,255,0.2); cursor: default; }
-  .nav-btn.primary { background: var(--green); border-color: transparent; color: #fff; font-weight: 600; }
-  .nav-btn.primary:disabled { background: var(--card); color: rgba(255,255,255,0.2); }
-  .nav-hint { font-size: 11px; color: rgba(255,255,255,0.2); }
-
-  /* Slide content styles */
-  .slide { display: none; height: 100%; }
-  .slide.active { display: flex; flex-direction: column; }
-
-  .profile-slide { align-items: center; justify-content: center; gap: 24px; text-align: center; }
-  .profile-avatar { width: 100px; height: 100px; border-radius: 50%; border: 3px solid rgba(255,255,255,0.2); background: #1e293b; overflow: hidden; }
-  .profile-avatar img { width: 100%; height: 100%; object-fit: cover; }
-  .profile-name { font-size: 40px; font-weight: 800; letter-spacing: -1px; font-family: 'Unbounded', sans-serif; }
-  .profile-role { font-size: 16px; color: var(--muted); margin-top: 6px; }
-  .profile-stats { display: flex; gap: 48px; margin-top: 12px; }
-  .profile-stat-num { font-size: 48px; font-weight: 800; font-family: 'Space Mono', monospace; }
-  .profile-stat-label { font-size: 12px; color: var(--muted); margin-top: 4px; }
-
-  .section-header { display: flex; align-items: center; gap: 12px; }
-  .section-bar { width: 6px; height: 32px; border-radius: 3px; }
-  .section-bar.big { width: 7px; height: 42px; border-radius: 4px; }
-  .section-breadcrumb { font-size: 15px; color: var(--muted); }
-  .section-sep { font-size: 15px; color: rgba(255,255,255,0.2); }
-  .section-title { font-size: 26px; font-weight: 700; font-family: 'Unbounded', sans-serif; }
-  .section-title.big { font-size: 36px; font-weight: 800; }
-
-  .overview-cards { display: flex; gap: 20px; flex-wrap: wrap; }
-  .overview-card { border-radius: 16px; padding: 24px 32px; text-align: center; }
-  .overview-card-num { font-size: 48px; font-weight: 800; font-family: 'Space Mono', monospace; }
-  .overview-card-label { font-size: 13px; color: var(--muted); margin-top: 4px; }
-
-  .bugs { display: flex; gap: 16px; align-items: center; margin-top: 8px; }
-  .bug-item { display: flex; align-items: center; gap: 6px; }
-  .bug-num { font-size: 13px; font-weight: 600; font-family: 'Space Mono', monospace; }
-
-  .metric-card {
-    border-radius: 16px; padding: 20px 24px; text-align: center; min-width: 140px;
-  }
-  .metric-num { font-size: 40px; font-weight: 800; font-family: 'Space Mono', monospace; }
-  .metric-label { font-size: 13px; color: var(--muted); margin-top: 4px; }
-  .metric-sub { font-size: 11px; margin-top: 2px; }
-
-  .task-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 10px; align-content: start; }
-  .task-card {
-    background: var(--card); border: 1px solid var(--border); border-radius: 12px;
-    padding: 14px 16px; display: flex; flex-direction: column; gap: 8px;
-  }
-  .task-top { display: flex; justify-content: space-between; align-items: center; }
-  .task-key { font-size: 11px; color: var(--muted); font-weight: 600; }
-  .task-status { font-size: 9px; font-weight: 700; padding: 3px 10px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.5px; }
-  .task-name { font-size: 14px; color: rgba(255,255,255,0.9); line-height: 1.4; }
-  .progress-bar { width: 100%; height: 5px; background: rgba(255,255,255,0.1); border-radius: 3px; overflow: hidden; }
-  .progress-fill { height: 100%; border-radius: 3px; transition: width 0.8s ease; }
-
-  .plans-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-  .plan-box { background: var(--card); border-radius: 14px; padding: 24px; border: 1px solid rgba(255,255,255,0.08); }
-  .plan-title { font-size: 16px; font-weight: 700; margin-bottom: 18px; font-family: 'JetBrains Mono', monospace; text-transform: uppercase; letter-spacing: 2px; }
-  .plan-items { display: flex; flex-direction: column; gap: 14px; }
-  .plan-item { display: flex; gap: 12px; align-items: flex-start; }
-  .plan-num { width: 26px; height: 26px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 12px; font-weight: 700; margin-top: 1px; }
-  .plan-text { font-size: 15px; color: rgba(255,255,255,0.8); line-height: 1.5; }
-
-  /* Vertical centering for sparse slides */
-  .slide-centered { justify-content: center; }
-
-  /* Dashboard / Chart slides */
-  .dash-grid { display: grid; gap: 10px; flex: 1; overflow: hidden; }
-  .dash-grid.cols-2 { grid-template-columns: 1fr 1fr; }
-  .dash-grid.cols-3 { grid-template-columns: 1fr 1fr 1fr; }
-  .chart-box {
-    background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 12px; padding: 12px; display: flex; flex-direction: column; overflow: hidden;
-  }
-  .chart-title {
-    font-size: 10px; font-weight: 700; color: rgba(255,255,255,0.5);
-    text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px;
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  }
-  .chart-canvas-wrap { flex: 1; position: relative; min-height: 0; }
-  .chart-canvas-wrap canvas { position: absolute; inset: 0; width: 100% !important; height: 100% !important; }
+  .dash{display:flex;flex-direction:column;height:100%;gap:8px;overflow:hidden}
+  .dg{display:grid;gap:8px;flex:1;overflow:hidden}
+  .dg.c2{grid-template-columns:1fr 1fr}
+  .dg.c3{grid-template-columns:1fr 1fr 1fr}
+  .cb{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:8px;display:flex;flex-direction:column;overflow:hidden}
+  .cb-t{font-size:8px;font-weight:700;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:.7px;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .cb-w{flex:1;position:relative;min-height:0}
+  .cb-w canvas{position:absolute;inset:0;width:100%!important;height:100%!important}
 </style>
 </head>
 <body>
-
-<!-- ═══════════════════════════════════════════════════════════ -->
-<!-- 📋 Дані тягнуться з source.xlsx в цій же папці             -->
-<!-- Щоб оновити — редагуй source.xlsx, пуш на GitHub, готово  -->
-<!-- ═══════════════════════════════════════════════════════════ -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-<script>
-let CONFIG = null;
-</script>
-<!-- ═══════════════ КІНЕЦЬ КОНФІГУРАЦІЇ ═══════════════════ -->
-
+<script>let CONFIG=null;</script>
 <div class="dot-bg"></div>
 
-<!-- LOADING SCREEN -->
-<div id="loading-screen" style="width:100%;height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;position:relative;">
-  <div class="anim" style="font-size:14px;color:rgba(255,255,255,0.5);font-family:'JetBrains Mono',monospace">
-    Завантаження даних...
-  </div>
-  <div style="width:120px;height:3px;background:rgba(255,255,255,0.1);border-radius:2px;overflow:hidden">
-    <div id="load-bar" style="width:0%;height:100%;background:#059669;border-radius:2px;transition:width 0.4s ease"></div>
-  </div>
-  <div id="load-error" style="display:none;font-size:12px;color:#EF4444;max-width:400px;text-align:center;line-height:1.6"></div>
+<div id="loading"><div class="anim" style="font-size:13px;color:rgba(255,255,255,0.45)">Завантаження...</div><div id="lbw"><div id="lb"></div></div><div id="lerr" style="display:none;font-size:11px;color:var(--red);max-width:400px;text-align:center;line-height:1.5"></div></div>
+
+<div id="lock" style="display:none">
+  <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.25)" stroke-width="1.5"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+  <div style="font-size:12px;color:rgba(255,255,255,0.35)">Введіть пароль</div>
+  <div id="pr" style="display:flex;gap:8px"><input type="password" id="pi" placeholder="••••••" autofocus><button onclick="unlock()">→</button></div>
+  <div id="pe" style="display:none;font-size:11px;color:var(--red)">Невірний пароль</div>
 </div>
 
-<!-- LOCK SCREEN -->
-<div id="lock-screen" style="display:none">
-  <div class="anim">
-    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="1.5">
-      <rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-    </svg>
-  </div>
-  <div class="anim d1" style="font-size:13px;color:rgba(255,255,255,0.4)">Введіть пароль для доступу</div>
-  <div id="pass-row" class="anim d2" style="display:flex;gap:8px">
-    <input type="password" id="pass-input" placeholder="••••••" autofocus>
-    <button onclick="tryUnlock()">→</button>
-  </div>
-  <div id="pass-error" style="font-size:12px;color:#EF4444;display:none">Невірний пароль</div>
-</div>
-
-<!-- DASHBOARD -->
-<div id="dashboard">
-  <div class="dot-bg"></div>
-
-  <div class="topbar">
-    <div class="topbar-left">
-      <img id="topbar-avatar" src="" alt="">
-      <span id="topbar-name"></span>
-    </div>
-    <div class="dots" id="dots-container"></div>
-    <span class="slide-counter" id="slide-counter"></span>
-  </div>
-
-  <div class="slide-area" id="slide-area"></div>
-
-  <div class="bottombar">
-    <button class="nav-btn" id="btn-prev" onclick="goTo(currentSlide-1)">← Назад</button>
-    <span class="nav-hint">← → або клік для навігації</span>
-    <button class="nav-btn primary" id="btn-next" onclick="goTo(currentSlide+1)">Далі →</button>
-  </div>
+<div id="app"><div class="dot-bg"></div>
+  <div class="topbar"><div class="tl"><img id="av" src=""><span id="nm"></span></div><div class="dots" id="dots"></div><span class="cnt" id="cnt"></span></div>
+  <div class="sa" id="area"></div>
+  <div class="bb"><button class="nb" id="bp" onclick="go(cur-1)">← Назад</button><span style="font-size:10px;color:rgba(255,255,255,0.15)">← → навігація</span><button class="nb p" id="bn" onclick="go(cur+1)">Далі →</button></div>
 </div>
 
 <script>
-// ── HELPERS ──
-const STATUS = {
-  done:        { bg: "#059669", text: "#fff", label: "Done" },
-  "in-progress": { bg: "#F59E0B", text: "#000", label: "In Progress" },
-  todo:        { bg: "#6B7280", text: "#fff", label: "To Do" },
-};
+const ST={done:{c:"#059669"},"in-progress":{c:"#F59E0B"},todo:{c:"#6B7280"}};
+function h(t,a,...ch){const e=document.createElement(t);if(a)Object.entries(a).forEach(([k,v])=>{if(k==="style"&&typeof v==="object")Object.assign(e.style,v);else if(k==="className")e.className=v;else e.setAttribute(k,v)});ch.flat().forEach(c=>{if(c!=null)e.append(typeof c==="string"?document.createTextNode(c):c)});return e}
+function fmt(n){if(n>=1e6)return(n/1e6).toFixed(1).replace('.0','')+'M';if(n>=1e3)return(n/1e3).toFixed(1).replace('.0','')+'K';return String(n)}
+function rs(wb,name){const ws=wb.Sheets[name];if(!ws)throw new Error('Таб "'+name+'" не знайдено');return XLSX.utils.sheet_to_json(ws,{defval:""}).filter(r=>{const f=Object.values(r)[0];return f&&!String(f).startsWith("⬆️")})}
 
-function h(tag, attrs, ...children) {
-  const el = document.createElement(tag);
-  if (attrs) Object.entries(attrs).forEach(([k, v]) => {
-    if (k === "style" && typeof v === "object") Object.assign(el.style, v);
-    else if (k === "className") el.className = v;
-    else if (k === "innerHTML") el.innerHTML = v;
-    else el.setAttribute(k, v);
-  });
-  children.flat().forEach(c => { if (c) el.append(typeof c === "string" ? document.createTextNode(c) : c); });
-  return el;
+async function loadData(){
+  try{
+    document.getElementById("lb").style.width="10%";
+    const r=await fetch("source.xlsx");if(!r.ok)throw new Error("source.xlsx не знайдено ("+r.status+")");
+    const buf=await r.arrayBuffer();document.getElementById("lb").style.width="40%";
+    const wb=XLSX.read(buf,{type:"array"});
+    const prof=rs(wb,"profile"),proj=rs(wb,"projects"),tasks=rs(wb,"tasks"),mets=rs(wb,"metrics"),plans=rs(wb,"plans");
+    let dbR=[],chR=[],cdR=[];try{dbR=rs(wb,"dashboards")}catch(e){}try{chR=rs(wb,"charts")}catch(e){}try{cdR=rs(wb,"chart_data")}catch(e){}
+    document.getElementById("lb").style.width="70%";
+    const pm={};prof.forEach(r=>pm[String(r.key)]=String(r.value));
+    CONFIG={password:pm.password||"",profile:{name:pm.name||"",role:pm.role||"",team:pm.team||"",avatar:pm.avatar||"avatar.png"},projects:[],dashboards:[]};
+    const tg={},mg={},pg={};
+    tasks.forEach(r=>{const p=r.project_id,s=r.section;(tg[p]=tg[p]||{})[s]=(tg[p][s]||[]);tg[p][s].push({key:String(r.key),name:r.name,status:r.status,progress:parseInt(r.progress)||0})});
+    mets.forEach(r=>{const p=r.project_id,s=r.section;(mg[p]=mg[p]||{})[s]=(mg[p][s]||[]);mg[p][s].push({label:r.label,value:parseInt(r.value)||0,sub:String(r.sub||"")})});
+    plans.forEach(r=>{const p=r.project_id;pg[p]=pg[p]||{business:[],tech:[]};if(r.type==="business")pg[p].business.push(r.text);else if(r.type==="tech")pg[p].tech.push(r.text)});
+    proj.forEach(r=>{const pid=r.id,sn=new Set();if(mg[pid])Object.keys(mg[pid]).forEach(s=>sn.add(s));if(tg[pid])Object.keys(tg[pid]).forEach(s=>sn.add(s));
+      const secs=[];sn.forEach(s=>secs.push({title:s,metrics:(mg[pid]&&mg[pid][s])||[],tasks:(tg[pid]&&tg[pid][s])||[]}));
+      CONFIG.projects.push({id:pid,title:r.title,color:r.color||"#3B82F6",stats:{completed:parseInt(r.completed)||0,bugs:{critical:parseInt(r.bugs_critical)||0,major:parseInt(r.bugs_major)||0,minor:parseInt(r.bugs_minor)||0}},sections:secs,plans:pg[pid]||{business:[],tech:[]}})});
+    const cdg={};cdR.forEach(r=>{(cdg[r.chart_id]=cdg[r.chart_id]||[]).push({label:String(r.label),value:parseFloat(r.value)||0,sub:String(r.sub||"")})});
+    dbR.forEach(d=>{const charts=chR.filter(c=>c.dashboard_id===d.id).sort((a,b)=>(+a.order||0)-(+b.order||0)).map(c=>({id:c.id,title:c.title,type:c.type||"bar",color:c.color||"#4F7CFF",data:cdg[c.id]||[]}));CONFIG.dashboards.push({id:d.id,title:d.title,columns:parseInt(d.columns)||3,charts})});
+    document.getElementById("lb").style.width="100%";return true;
+  }catch(err){document.getElementById("lerr").style.display="block";document.getElementById("lerr").textContent="❌ "+err.message;return false}
 }
 
-function progressBar(pct, color) {
-  const outer = h("div", { className: "progress-bar" });
-  const inner = h("div", { className: "progress-fill", style: { width: pct + "%", background: color || "#059669" } });
-  outer.append(inner);
-  return outer;
-}
+let slides=[],cur=0,ach=[];
+function buildSlides(){slides=[];const tc=CONFIG.projects.reduce((a,p)=>a+p.stats.completed,0);slides.push({type:"profile",tc,tp:CONFIG.projects.length});CONFIG.projects.forEach(p=>slides.push({type:"project",project:p}));CONFIG.dashboards.forEach(d=>slides.push({type:"dash",dashboard:d}))}
 
-function taskCard(t, delay) {
-  const s = STATUS[t.status];
-  const card = h("div", { className: "task-card anim", style: { animationDelay: delay + "s" } },
-    h("div", { className: "task-top" },
-      h("span", { className: "task-key" }, t.key),
-      h("span", { className: "task-status", style: { background: s.bg, color: s.text } }, s.label)
-    ),
-    h("span", { className: "task-name" }, t.name),
-    progressBar(t.progress, s.bg)
-  );
-  return card;
-}
+function rProfile(s){const p=CONFIG.profile;return h("div",{className:"prof anim"},h("img",{src:p.avatar}),h("div",null,h("h1",null,p.name),h("div",{className:"sub"},p.role+" · "+p.team)),h("div",{className:"sts"},h("div",null,h("div",{className:"sn",style:{color:"#059669"}},""+s.tc),h("div",{className:"sl"},"задач виконано")),h("div",null,h("div",{className:"sn",style:{color:"#3B82F6"}},""+s.tp),h("div",{className:"sl"},"проєктів"))))}
 
-function metricCard(m, delay, color) {
-  return h("div", { className: "metric-card anim", style: {
-    background: `linear-gradient(135deg, ${color}22, ${color}08)`,
-    border: `1px solid ${color}33`, animationDelay: delay + "s"
-  }},
-    h("div", { className: "metric-num", style: { color } }, "" + m.value),
-    h("div", { className: "metric-label" }, m.label),
-    m.sub ? h("div", { className: "metric-sub", style: {
-      color: m.sub.startsWith("+") && m.sub !== "+0" ? "#059669" : m.sub === "+0" ? "rgba(255,255,255,0.3)" : "#EF4444"
-    }}, m.sub) : null
-  );
-}
-
-function bugSvg(color) {
-  const s = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-  s.setAttribute("width", "16"); s.setAttribute("height", "16"); s.setAttribute("viewBox", "0 0 24 24");
-  const p = document.createElementNS("http://www.w3.org/2000/svg", "path");
-  p.setAttribute("d", "M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15v-2h2v2h-2zm0-4V7h2v6h-2z");
-  p.setAttribute("fill", color);
-  s.append(p);
-  return s;
-}
-
-// ── BUILD SLIDES ──
-let slides = [];
-let currentSlide = 0;
-
-function buildSlides() {
-  slides = [];
-  const totalCompleted = CONFIG.projects.reduce((a, p) => a + p.stats.completed, 0);
-  slides.push({ type: "profile", totalCompleted, totalProjects: CONFIG.projects.length });
-
-  CONFIG.projects.forEach(proj => {
-    slides.push({ type: "overview", project: proj });
-    proj.sections.forEach(sec => {
-      if (sec.tasks && sec.tasks.length > 0) slides.push({ type: "section", project: proj, section: sec });
-    });
-    if (proj.plans) slides.push({ type: "plans", project: proj });
-  });
-
-  // Dashboard slides
-  if (CONFIG.dashboards) {
-    CONFIG.dashboards.forEach(dash => {
-      slides.push({ type: "dashboard", dashboard: dash });
-    });
-  }
-}
-
-// ── RENDER SLIDES ──
-function renderProfile(s) {
-  const p = CONFIG.profile;
-  return h("div", { className: "profile-slide", style: { display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", height:"100%", gap:"32px", textAlign:"center" } },
-    h("div", { className: "profile-avatar anim" }, h("img", { src: p.avatar })),
-    h("div", { className: "anim d1" },
-      h("div", { className: "profile-name" }, p.name),
-      h("div", { className: "profile-role" }, p.role + " · " + p.team)
-    ),
-    h("div", { className: "profile-stats anim d2" },
-      h("div", null,
-        h("div", { className: "profile-stat-num", style: { color: "#059669" } }, "" + s.totalCompleted),
-        h("div", { className: "profile-stat-label" }, "задач виконано")
-      ),
-      h("div", null,
-        h("div", { className: "profile-stat-num", style: { color: "#3B82F6" } }, "" + s.totalProjects),
-        h("div", { className: "profile-stat-label" }, "проєктів")
-      )
+function rProject(s){
+  const p=s.project;
+  const tt=p.sections.reduce((a,s)=>a+(s.tasks?s.tasks.length:0),0);
+  const dn=p.sections.reduce((a,s)=>a+(s.tasks?s.tasks.filter(t=>t.status==="done").length:0),0);
+  const ip=p.sections.reduce((a,s)=>a+(s.tasks?s.tasks.filter(t=>t.status==="in-progress").length:0),0);
+  const td=tt-dn-ip;
+  const root=h("div",{className:"pf"});
+  // Header
+  root.append(h("div",{className:"pf-h anim"},
+    h("div",{className:"pf-bar",style:{background:p.color}}),
+    h("div",{className:"pf-t"},p.title),
+    h("div",{className:"pf-bg"},
+      h("span",{className:"pf-b"},h("i",{style:{background:"#059669"}}),dn+" ✓"),
+      h("span",{className:"pf-b"},h("i",{style:{background:"#F59E0B"}}),ip+" ⟳"),
+      h("span",{className:"pf-b"},h("i",{style:{background:"#6B7280"}}),td+" ○"),
+      h("span",{className:"pf-bugs"},"🐛 "+p.stats.bugs.critical+"/"+p.stats.bugs.major+"/"+p.stats.bugs.minor)
     )
-  );
-}
-
-function renderOverview(s) {
-  const p = s.project;
-  const totalTasks = p.sections.reduce((a, sec) => a + (sec.tasks ? sec.tasks.length : 0), 0);
-  const done = p.sections.reduce((a, sec) => a + (sec.tasks ? sec.tasks.filter(t => t.status === "done").length : 0), 0);
-  const inProg = p.sections.reduce((a, sec) => a + (sec.tasks ? sec.tasks.filter(t => t.status === "in-progress").length : 0), 0);
-  const todo = totalTasks - done - inProg;
-
-  const frag = h("div", { style: { display:"flex", flexDirection:"column", height:"100%", gap:"20px", justifyContent:"center" } },
-    h("div", { className: "section-header anim" },
-      h("div", { className: "section-bar big", style: { background: p.color } }),
-      h("div", { className: "section-title big" }, p.title)
-    ),
-    h("div", { className: "overview-cards anim d1" },
-      h("div", { className: "overview-card", style: { background:"rgba(5,150,105,0.15)", border:"1px solid rgba(5,150,105,0.3)" } },
-        h("div", { className: "overview-card-num", style: { color: "#059669" } }, "" + p.stats.completed),
-        h("div", { className: "overview-card-label" }, "Виконано задач")
-      ),
-      h("div", { className: "overview-card", style: { background:"rgba(245,158,11,0.15)", border:"1px solid rgba(245,158,11,0.3)" } },
-        h("div", { className: "overview-card-num", style: { color: "#F59E0B" } }, "" + inProg),
-        h("div", { className: "overview-card-label" }, "В роботі")
-      ),
-      h("div", { className: "overview-card", style: { background:"rgba(107,114,128,0.15)", border:"1px solid rgba(107,114,128,0.3)" } },
-        h("div", { className: "overview-card-num", style: { color: "#6B7280" } }, "" + todo),
-        h("div", { className: "overview-card-label" }, "To Do")
-      )
-    ),
-    h("div", { className: "anim d2" },
-      h("div", { style: { fontSize:"14px", color:"rgba(255,255,255,0.4)", marginBottom:"8px" } }, "Баги"),
-      h("div", { className: "bugs" },
-        ...[
-          { label: "Critical", color: "#EF4444", count: p.stats.bugs.critical },
-          { label: "Major", color: "#F59E0B", count: p.stats.bugs.major },
-          { label: "Minor", color: "#6B7280", count: p.stats.bugs.minor },
-        ].map(b => h("div", { className: "bug-item" }, bugSvg(b.color), h("span", { className: "bug-num", style: { color: b.color } }, "" + b.count)))
-      )
-    )
-  );
-
-  // Metrics sections
-  p.sections.filter(sec => sec.metrics && sec.metrics.length > 0).forEach(sec => {
-    const metricsRow = h("div", { className: "anim d3", style: { display:"flex", flexDirection:"column", gap:"12px" } },
-      h("div", { style: { fontSize:"14px", color:"rgba(255,255,255,0.4)" } }, sec.title),
-      h("div", { style: { display:"flex", gap:"16px", flexWrap:"wrap" } },
-        ...sec.metrics.map((m, i) => metricCard(m, 0.35 + i * 0.1, p.color))
-      )
-    );
-    frag.append(metricsRow);
+  ));
+  // Body columns
+  const body=h("div",{className:"pf-body anim d1"});
+  p.sections.forEach(sec=>{
+    const col=h("div",{className:"pf-col"});
+    col.append(h("div",{className:"pf-ch"},sec.title));
+    if(sec.metrics&&sec.metrics.length){const mr=h("div",{className:"pf-mr"});sec.metrics.forEach(m=>{mr.append(h("div",{className:"pf-m"},h("div",{className:"pf-mv",style:{color:p.color}},fmt(m.value)),h("div",{className:"pf-ml"},m.label)))});col.append(mr)}
+    if(sec.tasks)sec.tasks.forEach(t=>{const c=(ST[t.status]||ST.todo).c;col.append(h("div",{className:"tr"},h("div",{className:"tr-d",style:{background:c}}),h("div",{style:{flex:"1",minWidth:"0"}},h("div",{className:"tr-n"},t.name),h("div",{className:"tr-k"},t.key))))});
+    body.append(col);
   });
-
-  return frag;
-}
-
-function renderSection(s) {
-  const p = s.project, sec = s.section;
-  const container = h("div", { style: { display:"flex", flexDirection:"column", height:"100%", gap:"16px", justifyContent:"center" } },
-    h("div", { className: "section-header anim" },
-      h("div", { className: "section-bar", style: { background: p.color } }),
-      h("span", { className: "section-breadcrumb" }, p.title),
-      h("span", { className: "section-sep" }, "›"),
-      h("div", { className: "section-title" }, sec.title)
-    )
-  );
-
-  if (sec.metrics && sec.metrics.length > 0) {
-    container.append(h("div", { className: "anim d1", style: { display:"flex", gap:"16px", flexWrap:"wrap" } },
-      ...sec.metrics.map((m, i) => metricCard(m, 0.15 + i * 0.1, p.color))
-    ));
+  // Plans column
+  if(p.plans&&(p.plans.business.length||p.plans.tech.length)){
+    const pc=h("div",{className:"pf-col"});
+    pc.append(h("div",{className:"pf-ch"},"PLANS"));
+    if(p.plans.business.length){pc.append(h("div",{className:"pf-pt",style:{color:p.color}},"Business"));p.plans.business.forEach((t,i)=>pc.append(h("div",{className:"pf-pi"},h("span",{className:"pf-pn",style:{color:p.color}},(i+1)+"."),t)))}
+    if(p.plans.tech.length){pc.append(h("div",{className:"pf-pt",style:{color:"#818CF8"}},"Tech"));p.plans.tech.forEach((t,i)=>pc.append(h("div",{className:"pf-pi"},h("span",{className:"pf-pn",style:{color:"#818CF8"}},(i+1)+"."),t)))}
+    body.append(pc);
   }
-
-  const grid = h("div", { className: "task-grid" });
-  sec.tasks.forEach((t, i) => grid.append(taskCard(t, 0.1 + i * 0.06)));
-  container.append(grid);
-  return container;
+  root.append(body);return root;
 }
 
-function renderPlans(s) {
-  const p = s.project;
-  const planBox = (title, items, color) => {
-    const box = h("div", { className: "plan-box" },
-      h("div", { className: "plan-title", style: { color } }, title),
-      h("div", { className: "plan-items" },
-        ...items.map((txt, i) => h("div", { className: "plan-item" },
-          h("div", { className: "plan-num", style: { border: `2px solid ${color}44`, color } }, "" + (i + 1)),
-          h("span", { className: "plan-text" }, txt)
-        ))
-      )
-    );
-    return box;
-  };
-
-  return h("div", { style: { display:"flex", flexDirection:"column", height:"100%", gap:"24px", justifyContent:"center" } },
-    h("div", { className: "section-header anim" },
-      h("div", { className: "section-bar", style: { background: p.color } }),
-      h("span", { className: "section-breadcrumb" }, p.title),
-      h("span", { className: "section-sep" }, "›"),
-      h("div", { className: "section-title" }, "PLANS")
-    ),
-    h("div", { className: "plans-grid anim d1" },
-      planBox("Business", p.plans.business, p.color),
-      planBox("Tech", p.plans.tech, "#818CF8")
-    )
-  );
+function dch(){ach.forEach(c=>c.destroy());ach=[]}
+function mkch(cv,cd){
+  const lb=cd.data.map(d=>d.label),vl=cd.data.map(d=>d.value),isH=cd.type==="horizontal_bar",isL=cd.type==="line",bc=cd.color||"#4F7CFF";
+  const cols=vl.map((_,i)=>bc+Math.round((.5+i/Math.max(vl.length-1,1)*.5)*255).toString(16).padStart(2,'0'));
+  const c=new Chart(cv,{type:isL?"line":"bar",data:{labels:lb,datasets:[{data:vl,backgroundColor:isL?bc+"33":cols,borderColor:bc,borderWidth:isL?2:0,borderRadius:isL?0:3,fill:isL,tension:.3,pointBackgroundColor:bc,pointRadius:isL?3:0}]},
+    options:{indexAxis:isH?"y":"x",responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{backgroundColor:"#1E293B",titleColor:"#fff",bodyColor:"#fff",callbacks:{label:ctx=>ctx.parsed[isH?'x':'y'].toLocaleString()}}},
+      scales:{x:{grid:{color:"rgba(255,255,255,0.04)"},ticks:{color:"rgba(255,255,255,0.3)",font:{size:7,family:"'JetBrains Mono'"},maxRotation:45,callback:function(v){const l=this.getLabelForValue(v);return l.length>12?l.slice(0,11)+'…':l}}},y:{grid:{color:"rgba(255,255,255,0.04)"},ticks:{color:"rgba(255,255,255,0.3)",font:{size:7,family:"'JetBrains Mono'"},callback:v=>typeof v==='number'?fmt(v):v}}}}});
+  ach.push(c);
+}
+function rDash(s){
+  const d=s.dashboard,cols=d.columns||3,rows=Math.ceil(d.charts.length/cols);
+  const root=h("div",{className:"dash"});
+  root.append(h("div",{className:"pf-h anim"},h("div",{className:"pf-bar",style:{background:"#4F7CFF"}}),h("div",{className:"pf-t"},d.title)));
+  const g=h("div",{className:"dg c"+cols+" anim d1"});g.style.gridTemplateRows="repeat("+rows+",1fr)";
+  d.charts.forEach(cd=>{const box=h("div",{className:"cb"}),w=h("div",{className:"cb-w"}),cv=document.createElement("canvas");w.append(cv);box.append(h("div",{className:"cb-t"},cd.title),w);g.append(box);requestAnimationFrame(()=>requestAnimationFrame(()=>mkch(cv,cd)))});
+  root.append(g);return root;
 }
 
-// ── CHART RENDERING ──
-let activeCharts = [];
-
-function destroyCharts() {
-  activeCharts.forEach(c => c.destroy());
-  activeCharts = [];
+function go(i){if(i<0||i>=slides.length)return;cur=i;render()}
+function render(){
+  dch();const area=document.getElementById("area");area.innerHTML="";const s=slides[cur];
+  let el;if(s.type==="profile")el=rProfile(s);else if(s.type==="project")el=rProject(s);else if(s.type==="dash")el=rDash(s);
+  if(el)area.append(el);
+  const dots=document.getElementById("dots");dots.innerHTML="";const ac=s.project?s.project.color:s.dashboard?"#4F7CFF":"#059669";
+  slides.forEach((_,i)=>{const d=h("button",{className:"dot"+(i===cur?" active":"")});if(i===cur)d.style.background=ac;d.onclick=()=>go(i);dots.append(d)});
+  document.getElementById("cnt").textContent=(cur+1)+" / "+slides.length;
+  const bp=document.getElementById("bp"),bn=document.getElementById("bn");bp.disabled=cur===0;bn.disabled=cur===slides.length-1;
+  if(cur<slides.length-1){bn.style.background=ac;bn.style.color="#fff"}else{bn.style.background="";bn.style.color=""}
 }
 
-function formatNumber(n) {
-  if (n >= 1000000) return (n / 1000000).toFixed(1).replace('.0','') + 'M';
-  if (n >= 1000) return (n / 1000).toFixed(1).replace('.0','') + 'K';
-  return String(n);
-}
-
-function createChart(canvas, chartDef) {
-  const labels = chartDef.data.map(d => d.label);
-  const values = chartDef.data.map(d => d.value);
-  const isHorizontal = chartDef.type === "horizontal_bar";
-  const isLine = chartDef.type === "line";
-
-  const baseColor = chartDef.color || "#4F7CFF";
-  // Generate gradient of opacity for bars
-  const colors = values.map((_, i) => {
-    const opacity = 0.5 + (i / Math.max(values.length - 1, 1)) * 0.5;
-    return baseColor + Math.round(opacity * 255).toString(16).padStart(2, '0');
-  });
-
-  const config = {
-    type: isLine ? "line" : "bar",
-    data: {
-      labels,
-      datasets: [{
-        data: values,
-        backgroundColor: isLine ? baseColor + "33" : colors,
-        borderColor: baseColor,
-        borderWidth: isLine ? 2 : 0,
-        borderRadius: isLine ? 0 : 4,
-        fill: isLine,
-        tension: 0.3,
-        pointBackgroundColor: baseColor,
-        pointRadius: isLine ? 3 : 0,
-      }],
-    },
-    options: {
-      indexAxis: isHorizontal ? "y" : "x",
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: { display: false },
-        tooltip: {
-          backgroundColor: "#1E293B",
-          titleColor: "#fff",
-          bodyColor: "#fff",
-          borderColor: "rgba(255,255,255,0.1)",
-          borderWidth: 1,
-          callbacks: {
-            label: ctx => ctx.parsed[isHorizontal ? 'x' : 'y'].toLocaleString(),
-          },
-        },
-      },
-      scales: {
-        x: {
-          grid: { color: "rgba(255,255,255,0.05)", drawBorder: false },
-          ticks: {
-            color: "rgba(255,255,255,0.4)",
-            font: { size: 8, family: "'JetBrains Mono'" },
-            maxRotation: 45,
-            callback: function(val) {
-              const l = this.getLabelForValue(val);
-              return l.length > 10 ? l.slice(0, 9) + '…' : l;
-            },
-          },
-        },
-        y: {
-          grid: { color: "rgba(255,255,255,0.05)", drawBorder: false },
-          ticks: {
-            color: "rgba(255,255,255,0.4)",
-            font: { size: 8, family: "'JetBrains Mono'" },
-            callback: val => typeof val === 'number' ? formatNumber(val) : val,
-          },
-        },
-      },
-    },
-  };
-
-  const chart = new Chart(canvas, config);
-  activeCharts.push(chart);
-  return chart;
-}
-
-function renderDashboard(s) {
-  const dash = s.dashboard;
-  const cols = dash.columns || 3;
-  const rows = Math.ceil(dash.charts.length / cols);
-
-  const container = h("div", { style: { display:"flex", flexDirection:"column", height:"100%", gap:"10px" } },
-    h("div", { className: "section-header anim" },
-      h("div", { className: "section-bar big", style: { background: "#4F7CFF" } }),
-      h("div", { className: "section-title big" }, dash.title)
-    )
-  );
-
-  const grid = h("div", { className: `dash-grid cols-${cols} anim d1` });
-  grid.style.gridTemplateRows = `repeat(${rows}, 1fr)`;
-
-  dash.charts.forEach((chartDef, i) => {
-    const box = h("div", { className: "chart-box" });
-    const title = h("div", { className: "chart-title" }, chartDef.title);
-    const wrap = h("div", { className: "chart-canvas-wrap" });
-    const canvas = document.createElement("canvas");
-    wrap.append(canvas);
-    box.append(title, wrap);
-    grid.append(box);
-
-    // Render chart after DOM insertion
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => createChart(canvas, chartDef));
-    });
-  });
-
-  container.append(grid);
-  return container;
-}
-
-// ── XLSX PARSER (SheetJS) ──
-function readSheet(workbook, name) {
-  const ws = workbook.Sheets[name];
-  if (!ws) throw new Error(`Таб "${name}" не знайдено в source.xlsx`);
-  const rows = XLSX.utils.sheet_to_json(ws, { defval: "" });
-  // Filter out hint rows
-  return rows.filter(r => {
-    const first = Object.values(r)[0];
-    return first && !String(first).startsWith("⬆️");
-  });
-}
-
-function setLoadProgress(pct) {
-  document.getElementById("load-bar").style.width = pct + "%";
-}
-
-async function loadFromXlsx() {
-  try {
-    setLoadProgress(10);
-    const resp = await fetch("source.xlsx");
-    if (!resp.ok) throw new Error(`Не вдалось завантажити source.xlsx (${resp.status}). Перевір що файл лежить поруч з index.html`);
-    const buf = await resp.arrayBuffer();
-    setLoadProgress(40);
-
-    const wb = XLSX.read(buf, { type: "array" });
-    const profileRows = readSheet(wb, "profile");
-    const projectRows = readSheet(wb, "projects");
-    const taskRows    = readSheet(wb, "tasks");
-    const metricRows  = readSheet(wb, "metrics");
-    const planRows    = readSheet(wb, "plans");
-    // Chart tabs (optional — won't break if missing)
-    let dashboardRows = [], chartRows = [], chartDataRows = [];
-    try { dashboardRows = readSheet(wb, "dashboards"); } catch(e) {}
-    try { chartRows = readSheet(wb, "charts"); } catch(e) {}
-    try { chartDataRows = readSheet(wb, "chart_data"); } catch(e) {}
-    setLoadProgress(70);
-
-    // Build profile
-    const profileMap = {};
-    profileRows.forEach(r => { profileMap[String(r.key)] = String(r.value); });
-
-    // Build CONFIG
-    CONFIG = {
-      password: profileMap.password || "",
-      profile: {
-        name: profileMap.name || "Developer",
-        role: profileMap.role || "",
-        team: profileMap.team || "",
-        avatar: profileMap.avatar || "avatar.png",
-      },
-      projects: [],
-    };
-
-    // Group tasks, metrics, plans by project
-    const tasksByProj = {};
-    taskRows.forEach(r => {
-      const pid = r.project_id;
-      if (!tasksByProj[pid]) tasksByProj[pid] = {};
-      if (!tasksByProj[pid][r.section]) tasksByProj[pid][r.section] = [];
-      tasksByProj[pid][r.section].push({
-        key: r.key, name: r.name, status: r.status, progress: parseInt(r.progress) || 0,
-      });
-    });
-
-    const metricsByProj = {};
-    metricRows.forEach(r => {
-      const pid = r.project_id;
-      if (!metricsByProj[pid]) metricsByProj[pid] = {};
-      if (!metricsByProj[pid][r.section]) metricsByProj[pid][r.section] = [];
-      metricsByProj[pid][r.section].push({
-        label: r.label, value: parseInt(r.value) || 0, sub: String(r.sub || ""),
-      });
-    });
-
-    const plansByProj = {};
-    planRows.forEach(r => {
-      const pid = r.project_id;
-      if (!plansByProj[pid]) plansByProj[pid] = { business: [], tech: [] };
-      if (r.type === "business") plansByProj[pid].business.push(r.text);
-      else if (r.type === "tech") plansByProj[pid].tech.push(r.text);
-    });
-
-    // Build projects
-    projectRows.forEach(r => {
-      const pid = r.id;
-      // Collect all unique sections from tasks and metrics
-      const sectionNames = new Set();
-      if (metricsByProj[pid]) Object.keys(metricsByProj[pid]).forEach(s => sectionNames.add(s));
-      if (tasksByProj[pid]) Object.keys(tasksByProj[pid]).forEach(s => sectionNames.add(s));
-
-      const sections = [];
-      sectionNames.forEach(sName => {
-        sections.push({
-          title: sName,
-          metrics: (metricsByProj[pid] && metricsByProj[pid][sName]) || [],
-          tasks: (tasksByProj[pid] && tasksByProj[pid][sName]) || [],
-        });
-      });
-
-      CONFIG.projects.push({
-        id: pid,
-        title: r.title,
-        color: r.color || "#3B82F6",
-        stats: {
-          completed: parseInt(r.completed) || 0,
-          bugs: {
-            critical: parseInt(r.bugs_critical) || 0,
-            major: parseInt(r.bugs_major) || 0,
-            minor: parseInt(r.bugs_minor) || 0,
-          },
-        },
-        sections,
-        plans: plansByProj[pid] || { business: [], tech: [] },
-      });
-    });
-
-    // Build dashboards with charts
-    const chartDataByChart = {};
-    chartDataRows.forEach(r => {
-      if (!chartDataByChart[r.chart_id]) chartDataByChart[r.chart_id] = [];
-      chartDataByChart[r.chart_id].push({
-        label: String(r.label), value: parseFloat(r.value) || 0, sub: String(r.sub || ""),
-      });
-    });
-
-    CONFIG.dashboards = [];
-    dashboardRows.forEach(d => {
-      const dCharts = chartRows
-        .filter(c => c.dashboard_id === d.id)
-        .sort((a, b) => (parseInt(a.order) || 0) - (parseInt(b.order) || 0))
-        .map(c => ({
-          id: c.id,
-          title: c.title,
-          type: c.type || "bar",
-          color: c.color || "#4F7CFF",
-          data: chartDataByChart[c.id] || [],
-        }));
-      CONFIG.dashboards.push({
-        id: d.id,
-        title: d.title,
-        columns: parseInt(d.columns) || 3,
-        charts: dCharts,
-      });
-    });
-
-    setLoadProgress(100);
-    return true;
-  } catch (err) {
-    document.getElementById("load-error").style.display = "block";
-    document.getElementById("load-error").textContent = "❌ " + err.message;
-    return false;
-  }
-}
-
-// ── NAVIGATION ──
-function goTo(idx) {
-  if (idx < 0 || idx >= slides.length) return;
-  currentSlide = idx;
-  render();
-}
-
-function render() {
-  destroyCharts();
-  const area = document.getElementById("slide-area");
-  area.innerHTML = "";
-  const s = slides[currentSlide];
-
-  let content;
-  switch (s.type) {
-    case "profile": content = renderProfile(s); break;
-    case "overview": content = renderOverview(s); break;
-    case "section": content = renderSection(s); break;
-    case "plans": content = renderPlans(s); break;
-    case "dashboard": content = renderDashboard(s); break;
-  }
-  if (content) area.append(content);
-
-  // Update dots
-  const dots = document.getElementById("dots-container");
-  dots.innerHTML = "";
-  const accentColor = s.project ? s.project.color : s.dashboard ? "#4F7CFF" : "#059669";
-  slides.forEach((_, i) => {
-    const dot = h("button", { className: "dot" + (i === currentSlide ? " active" : "") });
-    if (i === currentSlide) dot.style.background = accentColor;
-    dot.onclick = () => goTo(i);
-    dots.append(dot);
-  });
-
-  document.getElementById("slide-counter").textContent = (currentSlide + 1) + " / " + slides.length;
-
-  const prev = document.getElementById("btn-prev");
-  const next = document.getElementById("btn-next");
-  prev.disabled = currentSlide === 0;
-  next.disabled = currentSlide === slides.length - 1;
-  if (currentSlide < slides.length - 1) {
-    next.style.background = accentColor;
-    next.style.borderColor = "transparent";
-    next.style.color = "#fff";
-  } else {
-    next.style.background = ""; next.style.borderColor = ""; next.style.color = "";
-  }
-}
-
-// ── PASSWORD ──
-function tryUnlock() {
-  const input = document.getElementById("pass-input");
-  if (input.value === CONFIG.password) {
-    document.getElementById("lock-screen").style.display = "none";
-    document.getElementById("dashboard").classList.add("active");
-    initDashboard();
-  } else {
-    const row = document.getElementById("pass-row");
-    input.classList.add("error");
-    row.classList.remove("shake");
-    void row.offsetWidth;
-    row.classList.add("shake");
-    document.getElementById("pass-error").style.display = "block";
-    setTimeout(() => { input.classList.remove("error"); document.getElementById("pass-error").style.display = "none"; }, 1200);
-  }
-}
-
-document.getElementById("pass-input").addEventListener("keydown", e => { if (e.key === "Enter") tryUnlock(); });
-
-function initDashboard() {
-  document.getElementById("topbar-avatar").src = CONFIG.profile.avatar;
-  document.getElementById("topbar-name").textContent = CONFIG.profile.name;
-  buildSlides();
-  render();
-}
-
-// Keyboard nav
-document.addEventListener("keydown", e => {
-  if (!document.getElementById("dashboard").classList.contains("active")) return;
-  if (e.key === "ArrowRight" || e.key === " ") { e.preventDefault(); goTo(currentSlide + 1); }
-  if (e.key === "ArrowLeft") { e.preventDefault(); goTo(currentSlide - 1); }
-});
-
-// ── BOOT ──
-(async function boot() {
-  const ok = await loadFromXlsx();
-  if (!ok) return;
-
-  document.getElementById("loading-screen").style.display = "none";
-
-  if (CONFIG.password) {
-    document.getElementById("lock-screen").style.display = "flex";
-  } else {
-    document.getElementById("dashboard").classList.add("active");
-    initDashboard();
-  }
-})();
+function unlock(){const inp=document.getElementById("pi");if(inp.value===CONFIG.password){document.getElementById("lock").style.display="none";document.getElementById("app").classList.add("on");start()}else{const r=document.getElementById("pr");inp.classList.add("err");r.classList.remove("shake");void r.offsetWidth;r.classList.add("shake");document.getElementById("pe").style.display="block";setTimeout(()=>{inp.classList.remove("err");document.getElementById("pe").style.display="none"},1e3)}}
+document.getElementById("pi").addEventListener("keydown",e=>{if(e.key==="Enter")unlock()});
+function start(){document.getElementById("av").src=CONFIG.profile.avatar;document.getElementById("nm").textContent=CONFIG.profile.name;buildSlides();render()}
+document.addEventListener("keydown",e=>{if(!document.getElementById("app").classList.contains("on"))return;if(e.key==="ArrowRight"||e.key===" "){e.preventDefault();go(cur+1)}if(e.key==="ArrowLeft"){e.preventDefault();go(cur-1)}});
+(async()=>{const ok=await loadData();if(!ok)return;document.getElementById("loading").style.display="none";if(CONFIG.password){document.getElementById("lock").style.display="flex"}else{document.getElementById("app").classList.add("on");start()}})();
 </script>
 </body>
 </html>
