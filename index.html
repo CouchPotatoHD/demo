@@ -57,7 +57,7 @@
 
   .topbar {
     display: flex; justify-content: space-between; align-items: center;
-    padding: 16px 32px; border-bottom: 1px solid rgba(255,255,255,0.06); position: relative; z-index: 2;
+    padding: 10px 24px; border-bottom: 1px solid rgba(255,255,255,0.06); position: relative; z-index: 2;
   }
   .topbar-left { display: flex; align-items: center; gap: 12px; }
   .topbar-left img { width: 32px; height: 32px; border-radius: 8px; background: #1e293b; }
@@ -70,13 +70,13 @@
   .dot.active { width: 24px; }
   .slide-counter { font-size: 12px; color: rgba(255,255,255,0.3); }
 
-  .slide-area { flex: 1; padding: 32px 48px; overflow: auto; position: relative; z-index: 1; }
+  .slide-area { flex: 1; padding: 20px 36px; overflow: hidden; position: relative; z-index: 1; }
   .slide-area::-webkit-scrollbar { width: 4px; }
   .slide-area::-webkit-scrollbar-thumb { background: var(--muted2); border-radius: 2px; }
 
   .bottombar {
     display: flex; justify-content: space-between; align-items: center;
-    padding: 12px 32px; border-top: 1px solid rgba(255,255,255,0.06); position: relative; z-index: 2;
+    padding: 10px 24px; border-top: 1px solid rgba(255,255,255,0.06); position: relative; z-index: 2;
   }
   .nav-btn {
     background: var(--card); border: 1px solid var(--border); border-radius: 8px;
@@ -92,160 +92,84 @@
   .slide { display: none; height: 100%; }
   .slide.active { display: flex; flex-direction: column; }
 
-  .profile-slide { align-items: center; justify-content: center; gap: 32px; text-align: center; }
-  .profile-avatar { width: 120px; height: 120px; border-radius: 50%; border: 3px solid rgba(255,255,255,0.2); background: #1e293b; overflow: hidden; }
+  .profile-slide { align-items: center; justify-content: center; gap: 24px; text-align: center; }
+  .profile-avatar { width: 100px; height: 100px; border-radius: 50%; border: 3px solid rgba(255,255,255,0.2); background: #1e293b; overflow: hidden; }
   .profile-avatar img { width: 100%; height: 100%; object-fit: cover; }
-  .profile-name { font-size: 48px; font-weight: 800; letter-spacing: -1px; font-family: 'Unbounded', sans-serif; }
-  .profile-role { font-size: 18px; color: var(--muted); margin-top: 8px; }
-  .profile-stats { display: flex; gap: 48px; margin-top: 16px; }
-  .profile-stat-num { font-size: 56px; font-weight: 800; font-family: 'Space Mono', monospace; }
-  .profile-stat-label { font-size: 13px; color: var(--muted); margin-top: 4px; }
+  .profile-name { font-size: 40px; font-weight: 800; letter-spacing: -1px; font-family: 'Unbounded', sans-serif; }
+  .profile-role { font-size: 16px; color: var(--muted); margin-top: 6px; }
+  .profile-stats { display: flex; gap: 48px; margin-top: 12px; }
+  .profile-stat-num { font-size: 48px; font-weight: 800; font-family: 'Space Mono', monospace; }
+  .profile-stat-label { font-size: 12px; color: var(--muted); margin-top: 4px; }
 
-  .section-header { display: flex; align-items: center; gap: 12px; }
-  .section-bar { width: 6px; height: 32px; border-radius: 3px; }
-  .section-bar.big { width: 8px; height: 48px; border-radius: 4px; }
-  .section-breadcrumb { font-size: 14px; color: var(--muted); }
-  .section-sep { font-size: 14px; color: rgba(255,255,255,0.2); }
-  .section-title { font-size: 28px; font-weight: 700; font-family: 'Unbounded', sans-serif; }
-  .section-title.big { font-size: 40px; font-weight: 800; }
+  .section-header { display: flex; align-items: center; gap: 10px; }
+  .section-bar { width: 5px; height: 26px; border-radius: 3px; }
+  .section-bar.big { width: 6px; height: 36px; border-radius: 4px; }
+  .section-breadcrumb { font-size: 13px; color: var(--muted); }
+  .section-sep { font-size: 13px; color: rgba(255,255,255,0.2); }
+  .section-title { font-size: 22px; font-weight: 700; font-family: 'Unbounded', sans-serif; }
+  .section-title.big { font-size: 32px; font-weight: 800; }
 
-  .overview-cards { display: flex; gap: 24px; flex-wrap: wrap; }
-  .overview-card { border-radius: 16px; padding: 20px 28px; text-align: center; }
-  .overview-card-num { font-size: 48px; font-weight: 800; font-family: 'Space Mono', monospace; }
-  .overview-card-label { font-size: 12px; color: var(--muted); }
+  .overview-cards { display: flex; gap: 16px; flex-wrap: wrap; }
+  .overview-card { border-radius: 14px; padding: 16px 24px; text-align: center; }
+  .overview-card-num { font-size: 38px; font-weight: 800; font-family: 'Space Mono', monospace; }
+  .overview-card-label { font-size: 11px; color: var(--muted); }
 
   .bugs { display: flex; gap: 16px; align-items: center; margin-top: 8px; }
   .bug-item { display: flex; align-items: center; gap: 6px; }
   .bug-num { font-size: 13px; font-weight: 600; font-family: 'Space Mono', monospace; }
 
   .metric-card {
-    border-radius: 16px; padding: 20px 24px; text-align: center; min-width: 140px;
+    border-radius: 14px; padding: 14px 18px; text-align: center; min-width: 120px;
   }
-  .metric-num { font-size: 42px; font-weight: 800; font-family: 'Space Mono', monospace; }
+  .metric-num { font-size: 34px; font-weight: 800; font-family: 'Space Mono', monospace; }
   .metric-label { font-size: 12px; color: var(--muted); margin-top: 4px; }
   .metric-sub { font-size: 11px; margin-top: 2px; }
 
-  .task-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; flex: 1; overflow-y: auto; }
-  .task-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; display: flex; flex-direction: column; gap: 8px; }
+  .task-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 8px; flex: 1; overflow: hidden; }
+  .task-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; display: flex; flex-direction: column; gap: 5px; }
   .task-top { display: flex; justify-content: space-between; align-items: center; }
-  .task-key { font-size: 11px; color: var(--muted); }
-  .task-status { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.5px; }
-  .task-name { font-size: 13px; color: rgba(255,255,255,0.9); line-height: 1.4; }
-  .progress-bar { width: 100%; height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; overflow: hidden; }
-  .progress-fill { height: 100%; border-radius: 3px; transition: width 0.8s ease; }
+  .task-key { font-size: 10px; color: var(--muted); }
+  .task-status { font-size: 9px; font-weight: 700; padding: 2px 7px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .task-name { font-size: 12px; color: rgba(255,255,255,0.9); line-height: 1.3; }
+  .progress-bar { width: 100%; height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; overflow: hidden; }
+  .progress-fill { height: 100%; border-radius: 2px; transition: width 0.8s ease; }
 
-  .plans-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; flex: 1; }
-  .plan-box { background: var(--card); border-radius: 16px; padding: 24px; border: 1px solid rgba(255,255,255,0.08); }
-  .plan-title { font-size: 16px; font-weight: 700; margin-bottom: 20px; font-family: 'JetBrains Mono', monospace; text-transform: uppercase; letter-spacing: 2px; }
-  .plan-items { display: flex; flex-direction: column; gap: 12px; }
-  .plan-item { display: flex; gap: 12px; align-items: flex-start; }
-  .plan-num { width: 24px; height: 24px; border-radius: 6px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 12px; font-weight: 700; margin-top: 1px; }
-  .plan-text { font-size: 14px; color: rgba(255,255,255,0.8); line-height: 1.6; }
+  .plans-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; flex: 1; }
+  .plan-box { background: var(--card); border-radius: 14px; padding: 18px; border: 1px solid rgba(255,255,255,0.08); }
+  .plan-title { font-size: 14px; font-weight: 700; margin-bottom: 14px; font-family: 'JetBrains Mono', monospace; text-transform: uppercase; letter-spacing: 2px; }
+  .plan-items { display: flex; flex-direction: column; gap: 10px; }
+  .plan-item { display: flex; gap: 10px; align-items: flex-start; }
+  .plan-num { width: 22px; height: 22px; border-radius: 6px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 11px; font-weight: 700; margin-top: 1px; }
+  .plan-text { font-size: 13px; color: rgba(255,255,255,0.8); line-height: 1.5; }
 </style>
 </head>
 <body>
 
 <!-- ═══════════════════════════════════════════════════════════ -->
-<!-- 📋 КОНФІГУРАЦІЯ — МІНЯЙ ТІЛЬКИ ЦЕЙ БЛОК                  -->
+<!-- 📋 Дані тягнуться з source.xlsx в цій же папці             -->
+<!-- Щоб оновити — редагуй source.xlsx, пуш на GitHub, готово  -->
 <!-- ═══════════════════════════════════════════════════════════ -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script>
-const CONFIG = {
-  // 🔒 Пароль для доступу (порожній = без паролю)
-  password: "ea2024",
-
-  profile: {
-    name: "Саша Ісмайлов",
-    role: "JAVA Chapter",
-    team: "EA + Corezoid",
-    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Sasha&backgroundColor=b6e3f4",
-  },
-
-  projects: [
-    {
-      id: "ea",
-      title: "Розвиток EA",
-      color: "#F59E0B",
-      stats: { completed: 72, bugs: { critical: 0, major: 0, minor: 1 } },
-      sections: [
-        {
-          title: "BUSINESS",
-          metrics: [
-            { label: "Нові процеси", value: 148, sub: "+0" },
-            { label: "Нові типи документів", value: 587, sub: "-1" },
-          ],
-          tasks: [],
-        },
-        {
-          title: "TECH",
-          tasks: [
-            { key: "EA-001", name: "Перехід на власний план на testImage", status: "done", progress: 100 },
-            { key: "EA-002", name: "Підготовка до DRP DC4", status: "done", progress: 100 },
-            { key: "EA-985", name: "DEV | JAVA | Виправлення невалідно мігрованих документів", status: "done", progress: 100 },
-            { key: "EA-003", name: "Розбір проблеми з індексацією elastic", status: "in-progress", progress: 65 },
-            { key: "EA-004", name: "Fulltest elastic + mongo removal", status: "done", progress: 100 },
-            { key: "EA-005", name: "Прибрати stateImage з помилок у респонс від NUXEO", status: "done", progress: 100 },
-          ],
-        },
-        {
-          title: "MIGRATION",
-          tasks: [
-            { key: "MIG-01", name: "MIGRATION | NUXEO SERVER 2019 → 2023", status: "in-progress", progress: 70 },
-            { key: "MIG-02", name: "Копіювання аудиту 2019→2023", status: "done", progress: 100 },
-            { key: "MIG-03", name: "Налаштування PROD NUXEO 2023", status: "in-progress", progress: 50 },
-            { key: "MIG-04", name: "Міграція бінарів прод 2023", status: "todo", progress: 0 },
-            { key: "EA-529", name: "NUXEO 2019 → NUXEO 2023 | Підготовка до релізу в PROD", status: "in-progress", progress: 40 },
-            { key: "MIG-05", name: "Ревью + узгодження плану дій щодо міграції 2023", status: "done", progress: 100 },
-          ],
-        },
-      ],
-      plans: {
-        business: [
-          "Завершити міграцію NUXEO 2019 → 2023",
-          "Підготувати документацію по новим процесам",
-        ],
-        tech: [
-          "Оптимізація elastic індексації",
-          "Fulltest mongo removal на PROD",
-          "DRP план для DC4",
-        ],
-      },
-    },
-    {
-      id: "corezoid",
-      title: "Corezoid",
-      color: "#3B82F6",
-      stats: { completed: 1, bugs: { critical: 0, major: 0, minor: 0 } },
-      sections: [
-        {
-          title: "TASKS",
-          tasks: [
-            { key: "JRRO-12511", name: "Customer Growth Tribe | PUMB Online — ЦОП | Перевірка за ІПН та оновлення даних клієнтів", status: "done", progress: 100 },
-            { key: "MMF-1098", name: "Easy Entry BOT | Оновлення логіки повернення Entity block_list", status: "in-progress", progress: 60 },
-            { key: "MMF-1149B", name: "Easy Entry | BOO | Логіка на нових повернення Entity block_list", status: "in-progress", progress: 45 },
-            { key: "MMF-1149B2", name: "Easy Entry | BOO | Оновлення Nodus повернення Entity block_list", status: "todo", progress: 0 },
-          ],
-        },
-      ],
-      plans: {
-        business: [
-          "Інтеграція з новими партнерами",
-          "Розширення функціоналу ЦОП",
-        ],
-        tech: [
-          "Рефакторинг Easy Entry BOT",
-          "Оптимізація Entity block_list",
-        ],
-      },
-    },
-  ],
-};
+let CONFIG = null;
 </script>
 <!-- ═══════════════ КІНЕЦЬ КОНФІГУРАЦІЇ ═══════════════════ -->
 
 <div class="dot-bg"></div>
 
+<!-- LOADING SCREEN -->
+<div id="loading-screen" style="width:100%;height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;position:relative;">
+  <div class="anim" style="font-size:14px;color:rgba(255,255,255,0.5);font-family:'JetBrains Mono',monospace">
+    Завантаження даних...
+  </div>
+  <div style="width:120px;height:3px;background:rgba(255,255,255,0.1);border-radius:2px;overflow:hidden">
+    <div id="load-bar" style="width:0%;height:100%;background:#059669;border-radius:2px;transition:width 0.4s ease"></div>
+  </div>
+  <div id="load-error" style="display:none;font-size:12px;color:#EF4444;max-width:400px;text-align:center;line-height:1.6"></div>
+</div>
+
 <!-- LOCK SCREEN -->
-<div id="lock-screen">
+<div id="lock-screen" style="display:none">
   <div class="anim">
     <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="1.5">
       <rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
@@ -391,7 +315,7 @@ function renderOverview(s) {
   const inProg = p.sections.reduce((a, sec) => a + (sec.tasks ? sec.tasks.filter(t => t.status === "in-progress").length : 0), 0);
   const todo = totalTasks - done - inProg;
 
-  const frag = h("div", { style: { display:"flex", flexDirection:"column", height:"100%", gap:"32px" } },
+  const frag = h("div", { style: { display:"flex", flexDirection:"column", height:"100%", gap:"20px" } },
     h("div", { className: "section-header anim" },
       h("div", { className: "section-bar big", style: { background: p.color } }),
       h("div", { className: "section-title big" }, p.title)
@@ -438,7 +362,7 @@ function renderOverview(s) {
 
 function renderSection(s) {
   const p = s.project, sec = s.section;
-  const container = h("div", { style: { display:"flex", flexDirection:"column", height:"100%", gap:"24px" } },
+  const container = h("div", { style: { display:"flex", flexDirection:"column", height:"100%", gap:"14px" } },
     h("div", { className: "section-header anim" },
       h("div", { className: "section-bar", style: { background: p.color } }),
       h("span", { className: "section-breadcrumb" }, p.title),
@@ -474,7 +398,7 @@ function renderPlans(s) {
     return box;
   };
 
-  return h("div", { style: { display:"flex", flexDirection:"column", height:"100%", gap:"32px" } },
+  return h("div", { style: { display:"flex", flexDirection:"column", height:"100%", gap:"20px" } },
     h("div", { className: "section-header anim" },
       h("div", { className: "section-bar", style: { background: p.color } }),
       h("span", { className: "section-breadcrumb" }, p.title),
@@ -486,6 +410,126 @@ function renderPlans(s) {
       planBox("Tech", p.plans.tech, "#818CF8")
     )
   );
+}
+
+// ── XLSX PARSER (SheetJS) ──
+function readSheet(workbook, name) {
+  const ws = workbook.Sheets[name];
+  if (!ws) throw new Error(`Таб "${name}" не знайдено в source.xlsx`);
+  const rows = XLSX.utils.sheet_to_json(ws, { defval: "" });
+  // Filter out hint rows
+  return rows.filter(r => {
+    const first = Object.values(r)[0];
+    return first && !String(first).startsWith("⬆️");
+  });
+}
+
+function setLoadProgress(pct) {
+  document.getElementById("load-bar").style.width = pct + "%";
+}
+
+async function loadFromXlsx() {
+  try {
+    setLoadProgress(10);
+    const resp = await fetch("source.xlsx");
+    if (!resp.ok) throw new Error(`Не вдалось завантажити source.xlsx (${resp.status}). Перевір що файл лежить поруч з index.html`);
+    const buf = await resp.arrayBuffer();
+    setLoadProgress(40);
+
+    const wb = XLSX.read(buf, { type: "array" });
+    const profileRows = readSheet(wb, "profile");
+    const projectRows = readSheet(wb, "projects");
+    const taskRows    = readSheet(wb, "tasks");
+    const metricRows  = readSheet(wb, "metrics");
+    const planRows    = readSheet(wb, "plans");
+    setLoadProgress(70);
+
+    // Build profile
+    const profileMap = {};
+    profileRows.forEach(r => { profileMap[String(r.key)] = String(r.value); });
+
+    // Build CONFIG
+    CONFIG = {
+      password: profileMap.password || "",
+      profile: {
+        name: profileMap.name || "Developer",
+        role: profileMap.role || "",
+        team: profileMap.team || "",
+        avatar: profileMap.avatar || "https://api.dicebear.com/7.x/avataaars/svg?seed=Dev",
+      },
+      projects: [],
+    };
+
+    // Group tasks, metrics, plans by project
+    const tasksByProj = {};
+    taskRows.forEach(r => {
+      const pid = r.project_id;
+      if (!tasksByProj[pid]) tasksByProj[pid] = {};
+      if (!tasksByProj[pid][r.section]) tasksByProj[pid][r.section] = [];
+      tasksByProj[pid][r.section].push({
+        key: r.key, name: r.name, status: r.status, progress: parseInt(r.progress) || 0,
+      });
+    });
+
+    const metricsByProj = {};
+    metricRows.forEach(r => {
+      const pid = r.project_id;
+      if (!metricsByProj[pid]) metricsByProj[pid] = {};
+      if (!metricsByProj[pid][r.section]) metricsByProj[pid][r.section] = [];
+      metricsByProj[pid][r.section].push({
+        label: r.label, value: parseInt(r.value) || 0, sub: String(r.sub || ""),
+      });
+    });
+
+    const plansByProj = {};
+    planRows.forEach(r => {
+      const pid = r.project_id;
+      if (!plansByProj[pid]) plansByProj[pid] = { business: [], tech: [] };
+      if (r.type === "business") plansByProj[pid].business.push(r.text);
+      else if (r.type === "tech") plansByProj[pid].tech.push(r.text);
+    });
+
+    // Build projects
+    projectRows.forEach(r => {
+      const pid = r.id;
+      // Collect all unique sections from tasks and metrics
+      const sectionNames = new Set();
+      if (metricsByProj[pid]) Object.keys(metricsByProj[pid]).forEach(s => sectionNames.add(s));
+      if (tasksByProj[pid]) Object.keys(tasksByProj[pid]).forEach(s => sectionNames.add(s));
+
+      const sections = [];
+      sectionNames.forEach(sName => {
+        sections.push({
+          title: sName,
+          metrics: (metricsByProj[pid] && metricsByProj[pid][sName]) || [],
+          tasks: (tasksByProj[pid] && tasksByProj[pid][sName]) || [],
+        });
+      });
+
+      CONFIG.projects.push({
+        id: pid,
+        title: r.title,
+        color: r.color || "#3B82F6",
+        stats: {
+          completed: parseInt(r.completed) || 0,
+          bugs: {
+            critical: parseInt(r.bugs_critical) || 0,
+            major: parseInt(r.bugs_major) || 0,
+            minor: parseInt(r.bugs_minor) || 0,
+          },
+        },
+        sections,
+        plans: plansByProj[pid] || { business: [], tech: [] },
+      });
+    });
+
+    setLoadProgress(100);
+    return true;
+  } catch (err) {
+    document.getElementById("load-error").style.display = "block";
+    document.getElementById("load-error").textContent = "❌ " + err.message;
+    return false;
+  }
 }
 
 // ── NAVIGATION ──
@@ -541,7 +585,7 @@ function tryUnlock() {
   if (input.value === CONFIG.password) {
     document.getElementById("lock-screen").style.display = "none";
     document.getElementById("dashboard").classList.add("active");
-    init();
+    initDashboard();
   } else {
     const row = document.getElementById("pass-row");
     input.classList.add("error");
@@ -555,7 +599,7 @@ function tryUnlock() {
 
 document.getElementById("pass-input").addEventListener("keydown", e => { if (e.key === "Enter") tryUnlock(); });
 
-function init() {
+function initDashboard() {
   document.getElementById("topbar-avatar").src = CONFIG.profile.avatar;
   document.getElementById("topbar-name").textContent = CONFIG.profile.name;
   buildSlides();
@@ -569,12 +613,20 @@ document.addEventListener("keydown", e => {
   if (e.key === "ArrowLeft") { e.preventDefault(); goTo(currentSlide - 1); }
 });
 
-// Skip password if empty
-if (!CONFIG.password) {
-  document.getElementById("lock-screen").style.display = "none";
-  document.getElementById("dashboard").classList.add("active");
-  init();
-}
+// ── BOOT ──
+(async function boot() {
+  const ok = await loadFromXlsx();
+  if (!ok) return;
+
+  document.getElementById("loading-screen").style.display = "none";
+
+  if (CONFIG.password) {
+    document.getElementById("lock-screen").style.display = "flex";
+  } else {
+    document.getElementById("dashboard").classList.add("active");
+    initDashboard();
+  }
+})();
 </script>
 </body>
 </html>
