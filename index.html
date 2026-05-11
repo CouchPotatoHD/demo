@@ -52,10 +52,10 @@
   .pf-h{display:flex;align-items:center;gap:14px;flex-shrink:0;flex-wrap:wrap}
   .pf-bar{width:6px;height:36px;border-radius:3px;flex-shrink:0}
   .pf-t{font-size:30px;font-weight:800;font-family:'Unbounded',sans-serif}
-  .pf-bg{display:flex;gap:14px;align-items:center;margin-left:auto}
-  .pf-b{display:flex;align-items:center;gap:5px;font-size:12px;font-weight:700;font-family:'Space Mono',monospace}
-  .pf-b i{width:7px;height:7px;border-radius:50%;display:inline-block}
-  .pf-bugs{font-size:10px;color:var(--muted)}
+  .pf-bg{display:flex;gap:16px;align-items:center;margin-left:auto}
+  .pf-b{display:flex;align-items:center;gap:6px;font-size:15px;font-weight:700;font-family:'Space Mono',monospace}
+  .pf-b i{width:12px;height:12px;border-radius:50%;display:inline-block}
+  .pf-bugs{font-size:13px;color:var(--muted)}
   .pf-body{display:flex;gap:12px;flex:1;min-height:0;overflow:hidden}
   .pf-col{flex:1;display:flex;flex-direction:column;gap:6px;min-width:0;overflow:hidden;padding-right:4px}
   .pf-col::-webkit-scrollbar{width:2px}
@@ -79,7 +79,7 @@
   .dg.c2{grid-template-columns:1fr 1fr}
   .dg.c3{grid-template-columns:1fr 1fr 1fr}
   .cb{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:8px;display:flex;flex-direction:column;overflow:hidden}
-  .cb-t{font-size:8px;font-weight:700;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:.7px;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .cb-t{font-size:10px;font-weight:700;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .cb-w{flex:1;position:relative;min-height:0}
   .cb-w canvas{position:absolute;inset:0;width:100%!important;height:100%!important}
 </style>
@@ -87,6 +87,7 @@
 <body>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-datalabels/2.2.0/chartjs-plugin-datalabels.min.js"></script>
 <script>let CONFIG=null;</script>
 <div class="dot-bg"></div>
 
@@ -129,7 +130,7 @@ async function loadData(){
     proj.forEach(r=>{const pid=r.id,sn=new Set();if(mg[pid])Object.keys(mg[pid]).forEach(s=>sn.add(s));if(tg[pid])Object.keys(tg[pid]).forEach(s=>sn.add(s));
       const secs=[];sn.forEach(s=>secs.push({title:s,metrics:(mg[pid]&&mg[pid][s])||[],tasks:(tg[pid]&&tg[pid][s])||[]}));
       CONFIG.projects.push({id:pid,title:r.title,color:r.color||"#3B82F6",stats:{completed:parseInt(r.completed)||0,bugs:{critical:parseInt(r.bugs_critical)||0,major:parseInt(r.bugs_major)||0,minor:parseInt(r.bugs_minor)||0}},sections:secs,plans:pg[pid]||{business:[],tech:[]}})});
-    const cdg={};cdR.forEach(r=>{(cdg[r.chart_id]=cdg[r.chart_id]||[]).push({label:String(r.label),value:parseFloat(r.value)||0,sub:String(r.sub||"")})});
+    const cdg={};cdR.forEach(r=>{(cdg[r.chart_id]=cdg[r.chart_id]||[]).push({label:String(r.label),value:parseFloat(r.value)||0,prev:parseFloat(r.prev_value)||0,sub:String(r.sub||"")})});
     dbR.forEach(d=>{const charts=chR.filter(c=>c.dashboard_id===d.id).sort((a,b)=>(+a.order||0)-(+b.order||0)).map(c=>({id:c.id,title:c.title,type:c.type||"bar",color:c.color||"#4F7CFF",data:cdg[c.id]||[]}));CONFIG.dashboards.push({id:d.id,title:d.title,columns:parseInt(d.columns)||3,charts})});
     document.getElementById("lb").style.width="100%";return true;
   }catch(err){document.getElementById("lerr").style.display="block";document.getElementById("lerr").textContent="❌ "+err.message;return false}
@@ -180,11 +181,26 @@ function rProject(s){
 
 function dch(){ach.forEach(c=>c.destroy());ach=[]}
 function mkch(cv,cd){
-  const lb=cd.data.map(d=>d.label),vl=cd.data.map(d=>d.value),isH=cd.type==="horizontal_bar",isL=cd.type==="line",bc=cd.color||"#4F7CFF";
+  const lb=cd.data.map(d=>d.label),vl=cd.data.map(d=>d.value),pv=cd.data.map(d=>d.prev),isH=cd.type==="horizontal_bar",isL=cd.type==="line",bc=cd.color||"#4F7CFF";
   const cols=vl.map((_,i)=>bc+Math.round((.5+i/Math.max(vl.length-1,1)*.5)*255).toString(16).padStart(2,'0'));
   const c=new Chart(cv,{type:isL?"line":"bar",data:{labels:lb,datasets:[{data:vl,backgroundColor:isL?bc+"33":cols,borderColor:bc,borderWidth:isL?2:0,borderRadius:isL?0:3,fill:isL,tension:.3,pointBackgroundColor:bc,pointRadius:isL?3:0}]},
-    options:{indexAxis:isH?"y":"x",responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{backgroundColor:"#1E293B",titleColor:"#fff",bodyColor:"#fff",callbacks:{label:ctx=>ctx.parsed[isH?'x':'y'].toLocaleString()}}},
-      scales:{x:{grid:{color:"rgba(255,255,255,0.04)"},ticks:{color:"rgba(255,255,255,0.3)",font:{size:7,family:"'JetBrains Mono'"},maxRotation:45,callback:function(v){const l=this.getLabelForValue(v);return l.length>12?l.slice(0,11)+'…':l}}},y:{grid:{color:"rgba(255,255,255,0.04)"},ticks:{color:"rgba(255,255,255,0.3)",font:{size:7,family:"'JetBrains Mono'"},callback:v=>typeof v==='number'?fmt(v):v}}}}});
+    plugins:[ChartDataLabels],
+    options:{indexAxis:isH?"y":"x",responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},
+        tooltip:{backgroundColor:"#1E293B",titleColor:"#fff",bodyColor:"#fff",callbacks:{label:ctx=>ctx.parsed[isH?'x':'y'].toLocaleString()}},
+        datalabels:{anchor:"end",align:"end",color:"rgba(255,255,255,0.7)",font:{size:9,weight:"bold",family:"'JetBrains Mono'"},
+          formatter:function(val,ctx){
+            const i=ctx.dataIndex,prev=pv[i];
+            let s=fmt(val);
+            if(prev){const d=val-prev;if(d>0)s+=" ↑"+fmt(d);else if(d<0)s+=" ↓"+fmt(Math.abs(d))}
+            return s;
+          }
+        }
+      },
+      scales:{
+        x:{grid:{color:"rgba(255,255,255,0.04)"},ticks:{color:"rgba(255,255,255,0.45)",font:{size:9,family:"'JetBrains Mono'"},maxRotation:45,callback:function(v){const l=this.getLabelForValue(v);return l.length>14?l.slice(0,13)+'…':l}}},
+        y:{grid:{color:"rgba(255,255,255,0.04)"},ticks:{color:"rgba(255,255,255,0.45)",font:{size:9,family:"'JetBrains Mono'"},callback:v=>typeof v==='number'?fmt(v):v}}
+      }}});
   ach.push(c);
 }
 function rDash(s){
