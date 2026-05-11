@@ -141,6 +141,22 @@
   .plan-item { display: flex; gap: 10px; align-items: flex-start; }
   .plan-num { width: 22px; height: 22px; border-radius: 6px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 11px; font-weight: 700; margin-top: 1px; }
   .plan-text { font-size: 13px; color: rgba(255,255,255,0.8); line-height: 1.5; }
+
+  /* Dashboard / Chart slides */
+  .dash-grid { display: grid; gap: 10px; flex: 1; overflow: hidden; }
+  .dash-grid.cols-2 { grid-template-columns: 1fr 1fr; }
+  .dash-grid.cols-3 { grid-template-columns: 1fr 1fr 1fr; }
+  .chart-box {
+    background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 12px; padding: 12px; display: flex; flex-direction: column; overflow: hidden;
+  }
+  .chart-title {
+    font-size: 10px; font-weight: 700; color: rgba(255,255,255,0.5);
+    text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .chart-canvas-wrap { flex: 1; position: relative; min-height: 0; }
+  .chart-canvas-wrap canvas { position: absolute; inset: 0; width: 100% !important; height: 100% !important; }
 </style>
 </head>
 <body>
@@ -150,6 +166,7 @@
 <!-- Щоб оновити — редагуй source.xlsx, пуш на GitHub, готово  -->
 <!-- ═══════════════════════════════════════════════════════════ -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script>
 let CONFIG = null;
 </script>
@@ -284,6 +301,13 @@ function buildSlides() {
     });
     if (proj.plans) slides.push({ type: "plans", project: proj });
   });
+
+  // Dashboard slides
+  if (CONFIG.dashboards) {
+    CONFIG.dashboards.forEach(dash => {
+      slides.push({ type: "dashboard", dashboard: dash });
+    });
+  }
 }
 
 // ── RENDER SLIDES ──
@@ -412,6 +436,130 @@ function renderPlans(s) {
   );
 }
 
+// ── CHART RENDERING ──
+let activeCharts = [];
+
+function destroyCharts() {
+  activeCharts.forEach(c => c.destroy());
+  activeCharts = [];
+}
+
+function formatNumber(n) {
+  if (n >= 1000000) return (n / 1000000).toFixed(1).replace('.0','') + 'M';
+  if (n >= 1000) return (n / 1000).toFixed(1).replace('.0','') + 'K';
+  return String(n);
+}
+
+function createChart(canvas, chartDef) {
+  const labels = chartDef.data.map(d => d.label);
+  const values = chartDef.data.map(d => d.value);
+  const isHorizontal = chartDef.type === "horizontal_bar";
+  const isLine = chartDef.type === "line";
+
+  const baseColor = chartDef.color || "#4F7CFF";
+  // Generate gradient of opacity for bars
+  const colors = values.map((_, i) => {
+    const opacity = 0.5 + (i / Math.max(values.length - 1, 1)) * 0.5;
+    return baseColor + Math.round(opacity * 255).toString(16).padStart(2, '0');
+  });
+
+  const config = {
+    type: isLine ? "line" : "bar",
+    data: {
+      labels,
+      datasets: [{
+        data: values,
+        backgroundColor: isLine ? baseColor + "33" : colors,
+        borderColor: baseColor,
+        borderWidth: isLine ? 2 : 0,
+        borderRadius: isLine ? 0 : 4,
+        fill: isLine,
+        tension: 0.3,
+        pointBackgroundColor: baseColor,
+        pointRadius: isLine ? 3 : 0,
+      }],
+    },
+    options: {
+      indexAxis: isHorizontal ? "y" : "x",
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: "#1E293B",
+          titleColor: "#fff",
+          bodyColor: "#fff",
+          borderColor: "rgba(255,255,255,0.1)",
+          borderWidth: 1,
+          callbacks: {
+            label: ctx => ctx.parsed[isHorizontal ? 'x' : 'y'].toLocaleString(),
+          },
+        },
+      },
+      scales: {
+        x: {
+          grid: { color: "rgba(255,255,255,0.05)", drawBorder: false },
+          ticks: {
+            color: "rgba(255,255,255,0.4)",
+            font: { size: 8, family: "'JetBrains Mono'" },
+            maxRotation: 45,
+            callback: function(val) {
+              const l = this.getLabelForValue(val);
+              return l.length > 10 ? l.slice(0, 9) + '…' : l;
+            },
+          },
+        },
+        y: {
+          grid: { color: "rgba(255,255,255,0.05)", drawBorder: false },
+          ticks: {
+            color: "rgba(255,255,255,0.4)",
+            font: { size: 8, family: "'JetBrains Mono'" },
+            callback: val => typeof val === 'number' ? formatNumber(val) : val,
+          },
+        },
+      },
+    },
+  };
+
+  const chart = new Chart(canvas, config);
+  activeCharts.push(chart);
+  return chart;
+}
+
+function renderDashboard(s) {
+  const dash = s.dashboard;
+  const cols = dash.columns || 3;
+  const rows = Math.ceil(dash.charts.length / cols);
+
+  const container = h("div", { style: { display:"flex", flexDirection:"column", height:"100%", gap:"10px" } },
+    h("div", { className: "section-header anim" },
+      h("div", { className: "section-bar big", style: { background: "#4F7CFF" } }),
+      h("div", { className: "section-title big" }, dash.title)
+    )
+  );
+
+  const grid = h("div", { className: `dash-grid cols-${cols} anim d1` });
+  grid.style.gridTemplateRows = `repeat(${rows}, 1fr)`;
+
+  dash.charts.forEach((chartDef, i) => {
+    const box = h("div", { className: "chart-box" });
+    const title = h("div", { className: "chart-title" }, chartDef.title);
+    const wrap = h("div", { className: "chart-canvas-wrap" });
+    const canvas = document.createElement("canvas");
+    wrap.append(canvas);
+    box.append(title, wrap);
+    grid.append(box);
+
+    // Render chart after DOM insertion
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => createChart(canvas, chartDef));
+    });
+  });
+
+  container.append(grid);
+  return container;
+}
+
 // ── XLSX PARSER (SheetJS) ──
 function readSheet(workbook, name) {
   const ws = workbook.Sheets[name];
@@ -442,6 +590,11 @@ async function loadFromXlsx() {
     const taskRows    = readSheet(wb, "tasks");
     const metricRows  = readSheet(wb, "metrics");
     const planRows    = readSheet(wb, "plans");
+    // Chart tabs (optional — won't break if missing)
+    let dashboardRows = [], chartRows = [], chartDataRows = [];
+    try { dashboardRows = readSheet(wb, "dashboards"); } catch(e) {}
+    try { chartRows = readSheet(wb, "charts"); } catch(e) {}
+    try { chartDataRows = readSheet(wb, "chart_data"); } catch(e) {}
     setLoadProgress(70);
 
     // Build profile
@@ -523,6 +676,35 @@ async function loadFromXlsx() {
       });
     });
 
+    // Build dashboards with charts
+    const chartDataByChart = {};
+    chartDataRows.forEach(r => {
+      if (!chartDataByChart[r.chart_id]) chartDataByChart[r.chart_id] = [];
+      chartDataByChart[r.chart_id].push({
+        label: String(r.label), value: parseFloat(r.value) || 0, sub: String(r.sub || ""),
+      });
+    });
+
+    CONFIG.dashboards = [];
+    dashboardRows.forEach(d => {
+      const dCharts = chartRows
+        .filter(c => c.dashboard_id === d.id)
+        .sort((a, b) => (parseInt(a.order) || 0) - (parseInt(b.order) || 0))
+        .map(c => ({
+          id: c.id,
+          title: c.title,
+          type: c.type || "bar",
+          color: c.color || "#4F7CFF",
+          data: chartDataByChart[c.id] || [],
+        }));
+      CONFIG.dashboards.push({
+        id: d.id,
+        title: d.title,
+        columns: parseInt(d.columns) || 3,
+        charts: dCharts,
+      });
+    });
+
     setLoadProgress(100);
     return true;
   } catch (err) {
@@ -540,6 +722,7 @@ function goTo(idx) {
 }
 
 function render() {
+  destroyCharts();
   const area = document.getElementById("slide-area");
   area.innerHTML = "";
   const s = slides[currentSlide];
@@ -550,13 +733,14 @@ function render() {
     case "overview": content = renderOverview(s); break;
     case "section": content = renderSection(s); break;
     case "plans": content = renderPlans(s); break;
+    case "dashboard": content = renderDashboard(s); break;
   }
   if (content) area.append(content);
 
   // Update dots
   const dots = document.getElementById("dots-container");
   dots.innerHTML = "";
-  const accentColor = s.project ? s.project.color : "#059669";
+  const accentColor = s.project ? s.project.color : s.dashboard ? "#4F7CFF" : "#059669";
   slides.forEach((_, i) => {
     const dot = h("button", { className: "dot" + (i === currentSlide ? " active" : "") });
     if (i === currentSlide) dot.style.background = accentColor;
