@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Developer Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;700;800&family=JetBrains+Mono:wght@400;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0B1120;
+    --text: #fff;
+    --muted: rgba(255,255,255,0.4);
+    --muted2: rgba(255,255,255,0.15);
+    --card: rgba(255,255,255,0.06);
+    --border: rgba(255,255,255,0.1);
+    --green: #059669;
+    --yellow: #F59E0B;
+    --gray: #6B7280;
+    --red: #EF4444;
+    --purple: #818CF8;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'JetBrains Mono', monospace; overflow: hidden; height: 100vh; }
+
+  @keyframes fadeSlideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes shake { 0%,100% { transform: translateX(0); } 20%,60% { transform: translateX(-8px); } 40%,80% { transform: translateX(8px); } }
+  .anim { animation: fadeSlideUp 0.5s ease both; }
+  .d1 { animation-delay: 0.1s; } .d2 { animation-delay: 0.2s; } .d3 { animation-delay: 0.3s; } .d4 { animation-delay: 0.35s; } .d5 { animation-delay: 0.4s; }
+
+  .dot-bg {
+    position: absolute; inset: 0; opacity: 0.03; pointer-events: none;
+    background-image: radial-gradient(circle at 1px 1px, white 1px, transparent 0);
+    background-size: 32px 32px;
+  }
+
+  /* Lock screen */
+  #lock-screen {
+    width: 100%; height: 100vh; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 24px; position: relative;
+  }
+  #lock-screen input {
+    background: var(--card); border: 1px solid var(--border); border-radius: 8px;
+    padding: 10px 16px; color: #fff; font-size: 15px; font-family: 'JetBrains Mono', monospace;
+    outline: none; width: 200px; transition: border-color 0.3s;
+  }
+  #lock-screen input.error { border-color: var(--red); }
+  #lock-screen button {
+    background: var(--green); border: none; border-radius: 8px; color: #fff;
+    padding: 10px 20px; cursor: pointer; font-size: 13px; font-family: 'JetBrains Mono', monospace; font-weight: 600;
+  }
+  #lock-screen .shake { animation: shake 0.4s ease; }
+
+  /* Dashboard */
+  #dashboard { display: none; flex-direction: column; height: 100vh; width: 100%; position: relative; }
+  #dashboard.active { display: flex; }
+
+  .topbar {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 16px 32px; border-bottom: 1px solid rgba(255,255,255,0.06); position: relative; z-index: 2;
+  }
+  .topbar-left { display: flex; align-items: center; gap: 12px; }
+  .topbar-left img { width: 32px; height: 32px; border-radius: 8px; background: #1e293b; }
+  .topbar-left span { font-size: 13px; color: var(--muted); }
+  .dots { display: flex; align-items: center; gap: 8px; }
+  .dot {
+    width: 8px; height: 8px; border-radius: 4px; border: none;
+    background: var(--muted2); cursor: pointer; padding: 0; transition: all 0.3s ease;
+  }
+  .dot.active { width: 24px; }
+  .slide-counter { font-size: 12px; color: rgba(255,255,255,0.3); }
+
+  .slide-area { flex: 1; padding: 32px 48px; overflow: auto; position: relative; z-index: 1; }
+  .slide-area::-webkit-scrollbar { width: 4px; }
+  .slide-area::-webkit-scrollbar-thumb { background: var(--muted2); border-radius: 2px; }
+
+  .bottombar {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 12px 32px; border-top: 1px solid rgba(255,255,255,0.06); position: relative; z-index: 2;
+  }
+  .nav-btn {
+    background: var(--card); border: 1px solid var(--border); border-radius: 8px;
+    color: rgba(255,255,255,0.7); padding: 8px 20px; cursor: pointer; font-size: 13px;
+    font-family: 'JetBrains Mono', monospace; transition: all 0.2s;
+  }
+  .nav-btn:disabled { color: rgba(255,255,255,0.2); cursor: default; }
+  .nav-btn.primary { background: var(--green); border-color: transparent; color: #fff; font-weight: 600; }
+  .nav-btn.primary:disabled { background: var(--card); color: rgba(255,255,255,0.2); }
+  .nav-hint { font-size: 11px; color: rgba(255,255,255,0.2); }
+
+  /* Slide content styles */
+  .slide { display: none; height: 100%; }
+  .slide.active { display: flex; flex-direction: column; }
+
+  .profile-slide { align-items: center; justify-content: center; gap: 32px; text-align: center; }
+  .profile-avatar { width: 120px; height: 120px; border-radius: 50%; border: 3px solid rgba(255,255,255,0.2); background: #1e293b; overflow: hidden; }
+  .profile-avatar img { width: 100%; height: 100%; object-fit: cover; }
+  .profile-name { font-size: 48px; font-weight: 800; letter-spacing: -1px; font-family: 'Unbounded', sans-serif; }
+  .profile-role { font-size: 18px; color: var(--muted); margin-top: 8px; }
+  .profile-stats { display: flex; gap: 48px; margin-top: 16px; }
+  .profile-stat-num { font-size: 56px; font-weight: 800; font-family: 'Space Mono', monospace; }
+  .profile-stat-label { font-size: 13px; color: var(--muted); margin-top: 4px; }
+
+  .section-header { display: flex; align-items: center; gap: 12px; }
+  .section-bar { width: 6px; height: 32px; border-radius: 3px; }
+  .section-bar.big { width: 8px; height: 48px; border-radius: 4px; }
+  .section-breadcrumb { font-size: 14px; color: var(--muted); }
+  .section-sep { font-size: 14px; color: rgba(255,255,255,0.2); }
+  .section-title { font-size: 28px; font-weight: 700; font-family: 'Unbounded', sans-serif; }
+  .section-title.big { font-size: 40px; font-weight: 800; }
+
+  .overview-cards { display: flex; gap: 24px; flex-wrap: wrap; }
+  .overview-card { border-radius: 16px; padding: 20px 28px; text-align: center; }
+  .overview-card-num { font-size: 48px; font-weight: 800; font-family: 'Space Mono', monospace; }
+  .overview-card-label { font-size: 12px; color: var(--muted); }
+
+  .bugs { display: flex; gap: 16px; align-items: center; margin-top: 8px; }
+  .bug-item { display: flex; align-items: center; gap: 6px; }
+  .bug-num { font-size: 13px; font-weight: 600; font-family: 'Space Mono', monospace; }
+
+  .metric-card {
+    border-radius: 16px; padding: 20px 24px; text-align: center; min-width: 140px;
+  }
+  .metric-num { font-size: 42px; font-weight: 800; font-family: 'Space Mono', monospace; }
+  .metric-label { font-size: 12px; color: var(--muted); margin-top: 4px; }
+  .metric-sub { font-size: 11px; margin-top: 2px; }
+
+  .task-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; flex: 1; overflow-y: auto; }
+  .task-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; display: flex; flex-direction: column; gap: 8px; }
+  .task-top { display: flex; justify-content: space-between; align-items: center; }
+  .task-key { font-size: 11px; color: var(--muted); }
+  .task-status { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .task-name { font-size: 13px; color: rgba(255,255,255,0.9); line-height: 1.4; }
+  .progress-bar { width: 100%; height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; overflow: hidden; }
+  .progress-fill { height: 100%; border-radius: 3px; transition: width 0.8s ease; }
+
+  .plans-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; flex: 1; }
+  .plan-box { background: var(--card); border-radius: 16px; padding: 24px; border: 1px solid rgba(255,255,255,0.08); }
+  .plan-title { font-size: 16px; font-weight: 700; margin-bottom: 20px; font-family: 'JetBrains Mono', monospace; text-transform: uppercase; letter-spacing: 2px; }
+  .plan-items { display: flex; flex-direction: column; gap: 12px; }
+  .plan-item { display: flex; gap: 12px; align-items: flex-start; }
+  .plan-num { width: 24px; height: 24px; border-radius: 6px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 12px; font-weight: 700; margin-top: 1px; }
+  .plan-text { font-size: 14px; color: rgba(255,255,255,0.8); line-height: 1.6; }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- 📋 КОНФІГУРАЦІЯ — МІНЯЙ ТІЛЬКИ ЦЕЙ БЛОК                  -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<script>
+const CONFIG = {
+  // 🔒 Пароль для доступу (порожній = без паролю)
+  password: "ea2024",
+
+  profile: {
+    name: "Саша Ісмайлов",
+    role: "JAVA Chapter",
+    team: "EA + Corezoid",
+    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Sasha&backgroundColor=b6e3f4",
+  },
+
+  projects: [
+    {
+      id: "ea",
+      title: "Розвиток EA",
+      color: "#F59E0B",
+      stats: { completed: 72, bugs: { critical: 0, major: 0, minor: 1 } },
+      sections: [
+        {
+          title: "BUSINESS",
+          metrics: [
+            { label: "Нові процеси", value: 148, sub: "+0" },
+            { label: "Нові типи документів", value: 587, sub: "-1" },
+          ],
+          tasks: [],
+        },
+        {
+          title: "TECH",
+          tasks: [
+            { key: "EA-001", name: "Перехід на власний план на testImage", status: "done", progress: 100 },
+            { key: "EA-002", name: "Підготовка до DRP DC4", status: "done", progress: 100 },
+            { key: "EA-985", name: "DEV | JAVA | Виправлення невалідно мігрованих документів", status: "done", progress: 100 },
+            { key: "EA-003", name: "Розбір проблеми з індексацією elastic", status: "in-progress", progress: 65 },
+            { key: "EA-004", name: "Fulltest elastic + mongo removal", status: "done", progress: 100 },
+            { key: "EA-005", name: "Прибрати stateImage з помилок у респонс від NUXEO", status: "done", progress: 100 },
+          ],
+        },
+        {
+          title: "MIGRATION",
+          tasks: [
+            { key: "MIG-01", name: "MIGRATION | NUXEO SERVER 2019 → 2023", status: "in-progress", progress: 70 },
+            { key: "MIG-02", name: "Копіювання аудиту 2019→2023", status: "done", progress: 100 },
+            { key: "MIG-03", name: "Налаштування PROD NUXEO 2023", status: "in-progress", progress: 50 },
+            { key: "MIG-04", name: "Міграція бінарів прод 2023", status: "todo", progress: 0 },
+            { key: "EA-529", name: "NUXEO 2019 → NUXEO 2023 | Підготовка до релізу в PROD", status: "in-progress", progress: 40 },
+            { key: "MIG-05", name: "Ревью + узгодження плану дій щодо міграції 2023", status: "done", progress: 100 },
+          ],
+        },
+      ],
+      plans: {
+        business: [
+          "Завершити міграцію NUXEO 2019 → 2023",
+          "Підготувати документацію по новим процесам",
+        ],
+        tech: [
+          "Оптимізація elastic індексації",
+          "Fulltest mongo removal на PROD",
+          "DRP план для DC4",
+        ],
+      },
+    },
+    {
+      id: "corezoid",
+      title: "Corezoid",
+      color: "#3B82F6",
+      stats: { completed: 1, bugs: { critical: 0, major: 0, minor: 0 } },
+      sections: [
+        {
+          title: "TASKS",
+          tasks: [
+            { key: "JRRO-12511", name: "Customer Growth Tribe | PUMB Online — ЦОП | Перевірка за ІПН та оновлення даних клієнтів", status: "done", progress: 100 },
+            { key: "MMF-1098", name: "Easy Entry BOT | Оновлення логіки повернення Entity block_list", status: "in-progress", progress: 60 },
+            { key: "MMF-1149B", name: "Easy Entry | BOO | Логіка на нових повернення Entity block_list", status: "in-progress", progress: 45 },
+            { key: "MMF-1149B2", name: "Easy Entry | BOO | Оновлення Nodus повернення Entity block_list", status: "todo", progress: 0 },
+          ],
+        },
+      ],
+      plans: {
+        business: [
+          "Інтеграція з новими партнерами",
+          "Розширення функціоналу ЦОП",
+        ],
+        tech: [
+          "Рефакторинг Easy Entry BOT",
+          "Оптимізація Entity block_list",
+        ],
+      },
+    },
+  ],
+};
+</script>
+<!-- ═══════════════ КІНЕЦЬ КОНФІГУРАЦІЇ ═══════════════════ -->
+
+<div class="dot-bg"></div>
+
+<!-- LOCK SCREEN -->
+<div id="lock-screen">
+  <div class="anim">
+    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="1.5">
+      <rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+    </svg>
+  </div>
+  <div class="anim d1" style="font-size:13px;color:rgba(255,255,255,0.4)">Введіть пароль для доступу</div>
+  <div id="pass-row" class="anim d2" style="display:flex;gap:8px">
+    <input type="password" id="pass-input" placeholder="••••••" autofocus>
+    <button onclick="tryUnlock()">→</button>
+  </div>
+  <div id="pass-error" style="font-size:12px;color:#EF4444;display:none">Невірний пароль</div>
+</div>
+
+<!-- DASHBOARD -->
+<div id="dashboard">
+  <div class="dot-bg"></div>
+
+  <div class="topbar">
+    <div class="topbar-left">
+      <img id="topbar-avatar" src="" alt="">
+      <span id="topbar-name"></span>
+    </div>
+    <div class="dots" id="dots-container"></div>
+    <span class="slide-counter" id="slide-counter"></span>
+  </div>
+
+  <div class="slide-area" id="slide-area"></div>
+
+  <div class="bottombar">
+    <button class="nav-btn" id="btn-prev" onclick="goTo(currentSlide-1)">← Назад</button>
+    <span class="nav-hint">← → або клік для навігації</span>
+    <button class="nav-btn primary" id="btn-next" onclick="goTo(currentSlide+1)">Далі →</button>
+  </div>
+</div>
+
+<script>
+// ── HELPERS ──
+const STATUS = {
+  done:        { bg: "#059669", text: "#fff", label: "Done" },
+  "in-progress": { bg: "#F59E0B", text: "#000", label: "In Progress" },
+  todo:        { bg: "#6B7280", text: "#fff", label: "To Do" },
+};
+
+function h(tag, attrs, ...children) {
+  const el = document.createElement(tag);
+  if (attrs) Object.entries(attrs).forEach(([k, v]) => {
+    if (k === "style" && typeof v === "object") Object.assign(el.style, v);
+    else if (k === "className") el.className = v;
+    else if (k === "innerHTML") el.innerHTML = v;
+    else el.setAttribute(k, v);
+  });
+  children.flat().forEach(c => { if (c) el.append(typeof c === "string" ? document.createTextNode(c) : c); });
+  return el;
+}
+
+function progressBar(pct, color) {
+  const outer = h("div", { className: "progress-bar" });
+  const inner = h("div", { className: "progress-fill", style: { width: pct + "%", background: color || "#059669" } });
+  outer.append(inner);
+  return outer;
+}
+
+function taskCard(t, delay) {
+  const s = STATUS[t.status];
+  const card = h("div", { className: "task-card anim", style: { animationDelay: delay + "s" } },
+    h("div", { className: "task-top" },
+      h("span", { className: "task-key" }, t.key),
+      h("span", { className: "task-status", style: { background: s.bg, color: s.text } }, s.label)
+    ),
+    h("span", { className: "task-name" }, t.name),
+    progressBar(t.progress, s.bg)
+  );
+  return card;
+}
+
+function metricCard(m, delay, color) {
+  return h("div", { className: "metric-card anim", style: {
+    background: `linear-gradient(135deg, ${color}22, ${color}08)`,
+    border: `1px solid ${color}33`, animationDelay: delay + "s"
+  }},
+    h("div", { className: "metric-num", style: { color } }, "" + m.value),
+    h("div", { className: "metric-label" }, m.label),
+    m.sub ? h("div", { className: "metric-sub", style: {
+      color: m.sub.startsWith("+") && m.sub !== "+0" ? "#059669" : m.sub === "+0" ? "rgba(255,255,255,0.3)" : "#EF4444"
+    }}, m.sub) : null
+  );
+}
+
+function bugSvg(color) {
+  const s = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  s.setAttribute("width", "16"); s.setAttribute("height", "16"); s.setAttribute("viewBox", "0 0 24 24");
+  const p = document.createElementNS("http://www.w3.org/2000/svg", "path");
+  p.setAttribute("d", "M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15v-2h2v2h-2zm0-4V7h2v6h-2z");
+  p.setAttribute("fill", color);
+  s.append(p);
+  return s;
+}
+
+// ── BUILD SLIDES ──
+let slides = [];
+let currentSlide = 0;
+
+function buildSlides() {
+  slides = [];
+  const totalCompleted = CONFIG.projects.reduce((a, p) => a + p.stats.completed, 0);
+  slides.push({ type: "profile", totalCompleted, totalProjects: CONFIG.projects.length });
+
+  CONFIG.projects.forEach(proj => {
+    slides.push({ type: "overview", project: proj });
+    proj.sections.forEach(sec => {
+      if (sec.tasks && sec.tasks.length > 0) slides.push({ type: "section", project: proj, section: sec });
+    });
+    if (proj.plans) slides.push({ type: "plans", project: proj });
+  });
+}
+
+// ── RENDER SLIDES ──
+function renderProfile(s) {
+  const p = CONFIG.profile;
+  return h("div", { className: "profile-slide", style: { display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", height:"100%", gap:"32px", textAlign:"center" } },
+    h("div", { className: "profile-avatar anim" }, h("img", { src: p.avatar })),
+    h("div", { className: "anim d1" },
+      h("div", { className: "profile-name" }, p.name),
+      h("div", { className: "profile-role" }, p.role + " · " + p.team)
+    ),
+    h("div", { className: "profile-stats anim d2" },
+      h("div", null,
+        h("div", { className: "profile-stat-num", style: { color: "#059669" } }, "" + s.totalCompleted),
+        h("div", { className: "profile-stat-label" }, "задач виконано")
+      ),
+      h("div", null,
+        h("div", { className: "profile-stat-num", style: { color: "#3B82F6" } }, "" + s.totalProjects),
+        h("div", { className: "profile-stat-label" }, "проєктів")
+      )
+    )
+  );
+}
+
+function renderOverview(s) {
+  const p = s.project;
+  const totalTasks = p.sections.reduce((a, sec) => a + (sec.tasks ? sec.tasks.length : 0), 0);
+  const done = p.sections.reduce((a, sec) => a + (sec.tasks ? sec.tasks.filter(t => t.status === "done").length : 0), 0);
+  const inProg = p.sections.reduce((a, sec) => a + (sec.tasks ? sec.tasks.filter(t => t.status === "in-progress").length : 0), 0);
+  const todo = totalTasks - done - inProg;
+
+  const frag = h("div", { style: { display:"flex", flexDirection:"column", height:"100%", gap:"32px" } },
+    h("div", { className: "section-header anim" },
+      h("div", { className: "section-bar big", style: { background: p.color } }),
+      h("div", { className: "section-title big" }, p.title)
+    ),
+    h("div", { className: "overview-cards anim d1" },
+      h("div", { className: "overview-card", style: { background:"rgba(5,150,105,0.15)", border:"1px solid rgba(5,150,105,0.3)" } },
+        h("div", { className: "overview-card-num", style: { color: "#059669" } }, "" + p.stats.completed),
+        h("div", { className: "overview-card-label" }, "Виконано задач")
+      ),
+      h("div", { className: "overview-card", style: { background:"rgba(245,158,11,0.15)", border:"1px solid rgba(245,158,11,0.3)" } },
+        h("div", { className: "overview-card-num", style: { color: "#F59E0B" } }, "" + inProg),
+        h("div", { className: "overview-card-label" }, "В роботі")
+      ),
+      h("div", { className: "overview-card", style: { background:"rgba(107,114,128,0.15)", border:"1px solid rgba(107,114,128,0.3)" } },
+        h("div", { className: "overview-card-num", style: { color: "#6B7280" } }, "" + todo),
+        h("div", { className: "overview-card-label" }, "To Do")
+      )
+    ),
+    h("div", { className: "anim d2" },
+      h("div", { style: { fontSize:"14px", color:"rgba(255,255,255,0.4)", marginBottom:"8px" } }, "Баги"),
+      h("div", { className: "bugs" },
+        ...[
+          { label: "Critical", color: "#EF4444", count: p.stats.bugs.critical },
+          { label: "Major", color: "#F59E0B", count: p.stats.bugs.major },
+          { label: "Minor", color: "#6B7280", count: p.stats.bugs.minor },
+        ].map(b => h("div", { className: "bug-item" }, bugSvg(b.color), h("span", { className: "bug-num", style: { color: b.color } }, "" + b.count)))
+      )
+    )
+  );
+
+  // Metrics sections
+  p.sections.filter(sec => sec.metrics && sec.metrics.length > 0).forEach(sec => {
+    const metricsRow = h("div", { className: "anim d3", style: { display:"flex", flexDirection:"column", gap:"12px" } },
+      h("div", { style: { fontSize:"14px", color:"rgba(255,255,255,0.4)" } }, sec.title),
+      h("div", { style: { display:"flex", gap:"16px", flexWrap:"wrap" } },
+        ...sec.metrics.map((m, i) => metricCard(m, 0.35 + i * 0.1, p.color))
+      )
+    );
+    frag.append(metricsRow);
+  });
+
+  return frag;
+}
+
+function renderSection(s) {
+  const p = s.project, sec = s.section;
+  const container = h("div", { style: { display:"flex", flexDirection:"column", height:"100%", gap:"24px" } },
+    h("div", { className: "section-header anim" },
+      h("div", { className: "section-bar", style: { background: p.color } }),
+      h("span", { className: "section-breadcrumb" }, p.title),
+      h("span", { className: "section-sep" }, "›"),
+      h("div", { className: "section-title" }, sec.title)
+    )
+  );
+
+  if (sec.metrics && sec.metrics.length > 0) {
+    container.append(h("div", { className: "anim d1", style: { display:"flex", gap:"16px", flexWrap:"wrap" } },
+      ...sec.metrics.map((m, i) => metricCard(m, 0.15 + i * 0.1, p.color))
+    ));
+  }
+
+  const grid = h("div", { className: "task-grid" });
+  sec.tasks.forEach((t, i) => grid.append(taskCard(t, 0.1 + i * 0.06)));
+  container.append(grid);
+  return container;
+}
+
+function renderPlans(s) {
+  const p = s.project;
+  const planBox = (title, items, color) => {
+    const box = h("div", { className: "plan-box" },
+      h("div", { className: "plan-title", style: { color } }, title),
+      h("div", { className: "plan-items" },
+        ...items.map((txt, i) => h("div", { className: "plan-item" },
+          h("div", { className: "plan-num", style: { border: `2px solid ${color}44`, color } }, "" + (i + 1)),
+          h("span", { className: "plan-text" }, txt)
+        ))
+      )
+    );
+    return box;
+  };
+
+  return h("div", { style: { display:"flex", flexDirection:"column", height:"100%", gap:"32px" } },
+    h("div", { className: "section-header anim" },
+      h("div", { className: "section-bar", style: { background: p.color } }),
+      h("span", { className: "section-breadcrumb" }, p.title),
+      h("span", { className: "section-sep" }, "›"),
+      h("div", { className: "section-title" }, "PLANS")
+    ),
+    h("div", { className: "plans-grid anim d1" },
+      planBox("Business", p.plans.business, p.color),
+      planBox("Tech", p.plans.tech, "#818CF8")
+    )
+  );
+}
+
+// ── NAVIGATION ──
+function goTo(idx) {
+  if (idx < 0 || idx >= slides.length) return;
+  currentSlide = idx;
+  render();
+}
+
+function render() {
+  const area = document.getElementById("slide-area");
+  area.innerHTML = "";
+  const s = slides[currentSlide];
+
+  let content;
+  switch (s.type) {
+    case "profile": content = renderProfile(s); break;
+    case "overview": content = renderOverview(s); break;
+    case "section": content = renderSection(s); break;
+    case "plans": content = renderPlans(s); break;
+  }
+  if (content) area.append(content);
+
+  // Update dots
+  const dots = document.getElementById("dots-container");
+  dots.innerHTML = "";
+  const accentColor = s.project ? s.project.color : "#059669";
+  slides.forEach((_, i) => {
+    const dot = h("button", { className: "dot" + (i === currentSlide ? " active" : "") });
+    if (i === currentSlide) dot.style.background = accentColor;
+    dot.onclick = () => goTo(i);
+    dots.append(dot);
+  });
+
+  document.getElementById("slide-counter").textContent = (currentSlide + 1) + " / " + slides.length;
+
+  const prev = document.getElementById("btn-prev");
+  const next = document.getElementById("btn-next");
+  prev.disabled = currentSlide === 0;
+  next.disabled = currentSlide === slides.length - 1;
+  if (currentSlide < slides.length - 1) {
+    next.style.background = accentColor;
+    next.style.borderColor = "transparent";
+    next.style.color = "#fff";
+  } else {
+    next.style.background = ""; next.style.borderColor = ""; next.style.color = "";
+  }
+}
+
+// ── PASSWORD ──
+function tryUnlock() {
+  const input = document.getElementById("pass-input");
+  if (input.value === CONFIG.password) {
+    document.getElementById("lock-screen").style.display = "none";
+    document.getElementById("dashboard").classList.add("active");
+    init();
+  } else {
+    const row = document.getElementById("pass-row");
+    input.classList.add("error");
+    row.classList.remove("shake");
+    void row.offsetWidth;
+    row.classList.add("shake");
+    document.getElementById("pass-error").style.display = "block";
+    setTimeout(() => { input.classList.remove("error"); document.getElementById("pass-error").style.display = "none"; }, 1200);
+  }
+}
+
+document.getElementById("pass-input").addEventListener("keydown", e => { if (e.key === "Enter") tryUnlock(); });
+
+function init() {
+  document.getElementById("topbar-avatar").src = CONFIG.profile.avatar;
+  document.getElementById("topbar-name").textContent = CONFIG.profile.name;
+  buildSlides();
+  render();
+}
+
+// Keyboard nav
+document.addEventListener("keydown", e => {
+  if (!document.getElementById("dashboard").classList.contains("active")) return;
+  if (e.key === "ArrowRight" || e.key === " ") { e.preventDefault(); goTo(currentSlide + 1); }
+  if (e.key === "ArrowLeft") { e.preventDefault(); goTo(currentSlide - 1); }
+});
+
+// Skip password if empty
+if (!CONFIG.password) {
+  document.getElementById("lock-screen").style.display = "none";
+  document.getElementById("dashboard").classList.add("active");
+  init();
+}
+</script>
+</body>
+</html>
