@@ -82,7 +82,7 @@
   #app{display:none;flex-direction:column;height:100vh;position:relative;z-index:1}
   #app.on{display:flex}
 
-  .topbar{display:flex;justify-content:space-between;align-items:center;padding:20px 40px;position:relative;z-index:3}
+  .topbar{display:flex;justify-content:space-between;align-items:center;padding:12px 28px;position:relative;z-index:3}
   .tl{display:flex;align-items:center;gap:14px;min-width:0}
   .tl img{width:38px;height:38px;border-radius:50%;object-fit:cover;border:1px solid var(--line-2)}
   .tl .tl-n{font-size:15px;font-weight:600;color:var(--ink)}
@@ -97,11 +97,11 @@
   .cnt{font-family:var(--font-mono);font-size:13px;color:var(--ink-3);font-variant-numeric:tabular-nums;letter-spacing:0}
   .cnt b{color:var(--ink);font-weight:600}
 
-  .sa{flex:1;padding:8px 40px 16px;overflow:hidden;position:relative;display:flex;flex-direction:column;min-height:0}
+  .sa{flex:1;padding:6px 28px 10px;overflow:hidden;position:relative;display:flex;flex-direction:column;min-height:0}
   .sa-scroll{flex:1;display:flex;flex-direction:column;min-height:0;overflow:auto;scrollbar-width:none}
   .sa-scroll::-webkit-scrollbar{display:none}
 
-  .bb{display:flex;justify-content:space-between;align-items:center;padding:14px 36px 22px;gap:12px;position:relative;z-index:2}
+  .bb{display:flex;justify-content:space-between;align-items:center;padding:8px 28px 12px;gap:12px;position:relative;z-index:2}
   .bb-hint{font-size:11px;color:var(--ink-3);letter-spacing:.02em;display:flex;align-items:center;gap:8px}
   .bb-hint kbd{font-family:var(--font-mono);background:rgba(255,255,255,.7);border:1px solid var(--line-2);border-radius:5px;padding:1px 6px;font-size:10px;color:var(--ink-2);box-shadow:0 1px 0 rgba(0,0,0,.04)}
   .nb{background:rgba(255,255,255,.7);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid var(--line);border-radius:999px;color:var(--ink);padding:12px 24px;cursor:pointer;font-size:14.5px;font-weight:500;letter-spacing:-.01em;transition:all .15s;font-family:var(--font-sf);box-shadow:var(--shadow-sm)}
@@ -195,23 +195,28 @@
   .pf-scroll::-webkit-scrollbar-thumb{background:rgba(0,0,0,.12);border-radius:3px}
 
   /* ──────── DASHBOARD ──────── */
-  .dash{display:flex;flex-direction:column;flex:1;min-height:0;gap:14px;overflow:hidden}
-  .dg{display:grid;gap:14px;flex:1;min-height:0;overflow:hidden}
+  .dash{display:flex;flex-direction:column;flex:1;min-height:0;gap:10px;overflow:hidden}
+  .dash .pf-head{padding:2px 4px 2px 0}
+  .dash .pf-eye{width:42px;height:42px;border-radius:13px;font-size:16px}
+  .dash .pf-t{font-size:clamp(20px,3.2vh,28px)}
+  .dash .pf-eyebrow{font-size:11px}
+  .dg{display:grid;gap:10px;flex:1;min-height:0;overflow:hidden}
   .dg.c1{grid-template-columns:1fr}
   .dg.c2{grid-template-columns:1fr 1fr}
   .dg.c3{grid-template-columns:repeat(3,1fr)}
   .dg.c4{grid-template-columns:repeat(4,1fr)}
-  .cb{background:var(--card);border:1px solid var(--line-2);border-radius:24px;padding:26px 30px 22px;display:flex;flex-direction:column;overflow:hidden;box-shadow:var(--shadow-sm);min-height:0}
-  .cb-h{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:16px}
-  .cb-tt{display:flex;flex-direction:column;gap:10px;flex:1;min-width:0}
-  .cb-t{font-size:18px;font-weight:600;color:var(--ink);letter-spacing:-.015em;line-height:1.3}
-  .cb-meta{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
-  .cb-total{font-size:28px;font-weight:700;letter-spacing:-.025em;font-variant-numeric:tabular-nums;color:var(--ink)}
-  .cb-delta{display:inline-flex;align-items:center;gap:4px;font-size:13px;font-weight:600;padding:5px 11px;border-radius:8px;font-variant-numeric:tabular-nums}
+  .cb{background:var(--card);border:1px solid var(--line-2);border-radius:18px;padding:14px 16px 10px;display:flex;flex-direction:column;overflow:hidden;box-shadow:var(--shadow-sm);min-height:0}
+  .cb-h{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:8px}
+  .cb-tt{display:flex;flex-direction:column;gap:5px;flex:1;min-width:0}
+  .cb-t{font-size:clamp(12px,1.7vh,14px);font-weight:600;color:var(--ink);letter-spacing:-.01em;line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .cb-meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .cb-total{font-size:clamp(16px,2.4vh,22px);font-weight:700;letter-spacing:-.025em;font-variant-numeric:tabular-nums;color:var(--ink);line-height:1}
+  .cb-delta{display:inline-flex;align-items:center;gap:3px;font-size:11px;font-weight:600;padding:3px 8px;border-radius:6px;font-variant-numeric:tabular-nums;white-space:nowrap}
   .cb-delta.pos{color:#0c7a3e;background:rgba(52,199,89,.13)}
   .cb-delta.neg{color:#c1170d;background:rgba(255,59,48,.1)}
   .cb-delta.zero{color:var(--ink-3);background:rgba(0,0,0,.04)}
-  .cb-tag{font-size:11px;font-weight:600;color:var(--ink-3);text-transform:uppercase;letter-spacing:.12em;padding:6px 11px;border-radius:8px;background:#f5f5f7;flex-shrink:0}
+  .cb-tag{display:none}
+  .cb-metric-lbl{font-size:10.5px;color:var(--ink-3);letter-spacing:.02em;margin-top:2px;font-weight:500}
   .cb-w{flex:1;position:relative;min-height:0}
   .cb-w canvas{position:absolute;inset:0;width:100%!important;height:100%!important}
 </style>
@@ -285,9 +290,13 @@ function h(t,a,...ch){
   return e
 }
 function fmt(n){
-  if(Math.abs(n)>=1e6)return(n/1e6).toFixed(1).replace('.0','')+'M';
-  if(Math.abs(n)>=1e3)return(n/1e3).toFixed(1).replace('.0','')+'K';
-  return String(n)
+  const a=Math.abs(n);
+  if(a>=1e9)return(n/1e9).toFixed(2)+'B';
+  if(a>=1e8)return(n/1e6).toFixed(0)+'M';
+  if(a>=1e6)return(n/1e6).toFixed(1)+'M';
+  if(a>=1e4)return(n/1e3).toFixed(0)+'K';
+  if(a>=1e3)return(n/1e3).toFixed(1)+'K';
+  return String(Math.round(n));
 }
 function xlDate(v){if(typeof v==='number'&&v>30000){const d=new Date((v-25569)*864e5);return String(d.getDate()).padStart(2,'0')+'.'+String(d.getMonth()+1).padStart(2,'0')+'.'+d.getFullYear()}return String(v)}
 function initials(s){return String(s||"").trim().split(/\s+/).slice(0,2).map(w=>w[0]||"").join("").toUpperCase()||"P"}
@@ -331,7 +340,12 @@ async function loadData(){
         planCount:pl.business.length+pl.tech.length
       })
     });
-    const cdg={};cdR.forEach(r=>{(cdg[r.chart_id]=cdg[r.chart_id]||[]).push({label:String(r.label),value:parseFloat(r.value)||0,prev:parseFloat(r.prev_value)||0,sub:String(r.sub||"")})});
+    const cdg={};cdR.forEach(r=>{
+      // Convert Excel date serials in labels (numeric ~ 30000-60000)
+      let lbl=r.label;
+      if(typeof lbl==='number'&&lbl>30000&&lbl<80000){lbl=xlDate(lbl)}
+      (cdg[r.chart_id]=cdg[r.chart_id]||[]).push({label:String(lbl),value:parseFloat(r.value)||0,prev:parseFloat(r.prev_value)||0,sub:String(r.sub||"")})
+    });
     dbR.forEach((d,idx)=>{
       const charts=chR.filter(c=>c.dashboard_id===d.id).sort((a,b)=>(+a.order||0)-(+b.order||0)).map((c,ci)=>({id:c.id,title:c.title,type:c.type||"bar",color:PALETTE[ci%PALETTE.length],data:cdg[c.id]||[]}));
       CONFIG.dashboards.push({id:d.id,title:d.title,columns:parseInt(d.columns)||3,charts})
@@ -501,9 +515,29 @@ function rProject(s){
 
 /* ─────────── DASHBOARD ─────────── */
 function dch(){ach.forEach(c=>{try{c.destroy()}catch(e){}});ach=[]}
+
+// Compress data: keep top N, fold the rest into "Інше"
+function compressData(data,n){
+  if(data.length<=n)return data;
+  const sorted=[...data].sort((a,b)=>b.value-a.value);
+  const top=sorted.slice(0,n);
+  const rest=sorted.slice(n);
+  const otherV=rest.reduce((a,d)=>a+d.value,0);
+  const otherP=rest.reduce((a,d)=>a+(d.prev||0),0);
+  top.push({label:"Інше ("+rest.length+")",value:otherV,prev:otherP,sub:"",_folded:rest});
+  return top;
+}
 function mkch(cv,cd){
-  const lb=cd.data.map(d=>d.label),vl=cd.data.map(d=>d.value),pv=cd.data.map(d=>d.prev),sb=cd.data.map(d=>d.sub||"");
-  const isH=cd.type==="horizontal_bar",isL=cd.type==="line";
+  // Auto-rotate to horizontal bar when many categories OR long labels
+  let data=cd.data;
+  let type=cd.type;
+  const maxLabelLen=Math.max(...data.map(d=>String(d.label).length));
+  if(type==='bar'&&(data.length>10||maxLabelLen>14)){
+    type='horizontal_bar';
+    data=compressData(data,12);
+  }
+  const lb=data.map(d=>d.label),vl=data.map(d=>d.value),pv=data.map(d=>d.prev),sb=data.map(d=>d.sub||""),fold=data.map(d=>d._folded||null);
+  const isH=type==="horizontal_bar",isL=type==="line";
   const bc=cd.color||"#0071e3";
   // hex to rgba
   const hex2=(h,a)=>{const x=h.replace('#','');const r=parseInt(x.slice(0,2),16),g=parseInt(x.slice(2,4),16),b=parseInt(x.slice(4,6),16);return"rgba("+r+","+g+","+b+","+a+")"};
@@ -528,7 +562,7 @@ function mkch(cv,cd){
     options:{
       indexAxis:isH?"y":"x",
       responsive:true,maintainAspectRatio:false,
-      layout:{padding:{top:42,right:14,left:0,bottom:0}},
+      layout:{padding:{top:isH?8:20,right:isH?96:14,left:0,bottom:0}},
       animation:{duration:700,easing:'easeOutCubic'},
       plugins:{
         legend:{display:false},
@@ -541,42 +575,52 @@ function mkch(cv,cd){
           bodyFont:{family:"-apple-system",size:12},
           displayColors:false,
           callbacks:{
-            label:ctx=>ctx.parsed[isH?'x':'y'].toLocaleString(),
-            afterLabel:ctx=>sb[ctx.dataIndex]?sb[ctx.dataIndex]:""
+            label:function(ctx){
+              const i=ctx.dataIndex;
+              const v=ctx.parsed[isH?'x':'y'];
+              const lines=[v.toLocaleString()];
+              const prev=pv[i];
+              if(prev){
+                const d=v-prev,pct=prev?(d/prev*100):0;
+                if(d!==0)lines.push((d>0?"↑ +":"↓ ")+fmt(Math.abs(d))+" ("+(d>0?"+":"")+pct.toFixed(1)+"%)");
+              }
+              return lines;
+            },
+            afterBody:function(items){
+              if(!items||!items.length)return"";
+              const i=items[0].dataIndex;
+              const f=fold[i];
+              if(!f||!f.length)return"";
+              const lines=["","Включає:"];
+              f.slice(0,10).forEach(x=>{lines.push("  • "+x.label+" — "+x.value.toLocaleString())});
+              if(f.length>10)lines.push("  … та ще "+(f.length-10));
+              return lines;
+            }
           }
         },
         datalabels:{
           display:ctx=>ctx.dataset.data.length<=14,
           anchor:"end",
           align:isH?"right":"top",
-          textAlign:"center",
-          labels:{
-            title:{
-              offset:isH?6:20,
-              color:"#1d1d1f",
-              font:{size:13,weight:"700",family:"-apple-system"},
-              formatter:val=>fmt(val)
-            },
-            sub:{
-              offset:4,
-              color:ctx=>{
-                const i=ctx.dataIndex;
-                const s=sb[i]||"";
-                if(s.startsWith("+")||s.startsWith("↑"))return "#0c7a3e";
-                if(s.startsWith("-")||s.startsWith("↓"))return "#c1170d";
-                if(pv[i]){const d=ctx.parsed[isH?'x':'y']-pv[i];if(d>0)return"#0c7a3e";if(d<0)return"#c1170d"}
-                return "rgba(0,0,0,0)";
-              },
-              font:{size:11.5,weight:"600",family:"-apple-system"},
-              formatter:(val,ctx)=>{
-                const i=ctx.dataIndex;
-                const s=sb[i];
-                if(s)return s;
-                const prev=pv[i];
-                if(prev){const d=val-prev;if(d>0)return"↑ "+fmt(d);if(d<0)return"↓ "+fmt(Math.abs(d))}
-                return"";
-              }
-            }
+          offset:isH?6:4,
+          textAlign:isH?"left":"center",
+          padding:{top:0,bottom:0,left:0,right:0},
+          color:ctx=>{
+            const i=ctx.dataIndex;
+            const val=ctx.dataset.data[i];
+            const s=sb[i]||"";
+            if(s.startsWith("-")||s.startsWith("↓"))return"#c1170d";
+            if(s.startsWith("+")||s.startsWith("↑"))return"#0c7a3e";
+            if(pv[i]&&typeof val==='number'){const d=val-pv[i];if(d<0)return"#c1170d";if(d>0)return"#0c7a3e"}
+            return"#1d1d1f";
+          },
+          font:{size:11,weight:"700",family:"-apple-system",lineHeight:1.15},
+          formatter:(val,ctx)=>{
+            const i=ctx.dataIndex;
+            const main=fmt(val);
+            const prev=pv[i];
+            if(prev){const d=val-prev;if(d!==0)return main+"  "+(d>0?"↑":"↓")+fmt(Math.abs(d))}
+            return main;
           }
         }
       },
@@ -584,12 +628,12 @@ function mkch(cv,cd){
         x:{
           grid:{display:!isH,color:"rgba(0,0,0,.05)",drawBorder:false},
           border:{display:false},
-          ticks:{color:"rgba(0,0,0,.6)",font:{size:13,family:"-apple-system",weight:"500"},maxRotation:30,callback:function(v){const l=this.getLabelForValue(v);return l.length>16?l.slice(0,15)+'…':l}}
+          ticks:{color:"rgba(0,0,0,.6)",font:{size:isH?11:11,family:"-apple-system",weight:"500"},maxRotation:isH?0:0,callback:function(v){const l=this.getLabelForValue(v);if(isH)return typeof l==='number'?fmt(l):l;return l.length>14?l.slice(0,13)+'…':l}}
         },
         y:{
           grid:{display:isH?false:true,color:"rgba(0,0,0,.05)",drawBorder:false},
           border:{display:false},
-          ticks:{color:"rgba(0,0,0,.6)",font:{size:13,family:"-apple-system",weight:"500"},callback:v=>typeof v==='number'?fmt(v):v}
+          ticks:{color:"rgba(0,0,0,.6)",font:{size:isH?11:11,family:"-apple-system",weight:"500"},callback:function(v){if(isH){const l=this.getLabelForValue(v);return l.length>16?l.slice(0,15)+'…':l}return typeof v==='number'?fmt(v):v}}
         }
       }
     }
@@ -615,43 +659,50 @@ function rDash(s){
   const g=h("div",{className:"dg c"+cols+" anim d1"});
   g.style.gridTemplateRows="1fr";
   charts.forEach(cd=>{
+    // Detect if this is a time series by looking at labels (YYYY-MM, dates, month names)
+    const isTimeSeries=cd.type==='line'||cd.data.every(d=>{
+      const s=String(d.label);
+      return /^\d{4}[-./]\d{1,2}/.test(s)||/^\d{1,2}[-./]\d{4}/.test(s)||/^\d{1,2}[-./]\d{1,2}[-./]\d{2,4}/.test(s);
+    });
     // Compute total and overall trend
     const total=cd.data.reduce((a,d)=>a+(d.value||0),0);
-    let prevTotal=0,hasPrev=false;
-    cd.data.forEach(d=>{if(d.prev){prevTotal+=d.prev;hasPrev=true}});
-    let delta=null;
-    if(hasPrev){
-      const diff=total-prevTotal;
-      const pct=prevTotal?(diff/prevTotal*100):0;
+    let delta=null,deltaHint="";
+    if(isTimeSeries&&cd.data.length>=2){
+      // Time series: compare last vs first period in window
+      const first=cd.data[0].value,last=cd.data[cd.data.length-1].value;
+      const diff=last-first;
+      const pct=first?(diff/first*100):0;
       delta={diff,pct,cls:diff>0?"pos":diff<0?"neg":"zero",arrow:diff>0?"↑":diff<0?"↓":"·"};
+      deltaHint="Останнє вокно ("+cd.data[cd.data.length-1].label+") vs перше ("+cd.data[0].label+")";
     }else{
-      // try aggregating sub strings
-      const subs=cd.data.map(d=>d.sub||"").filter(x=>x);
-      const last=subs[subs.length-1];
-      if(last){
-        const cls=last.startsWith("+")?"pos":last.startsWith("-")?"neg":"zero";
-        delta={txt:last,cls,arrow:last.startsWith("+")?"↑":last.startsWith("-")?"↓":"·"};
+      let prevTotal=0,hasPrev=false;
+      cd.data.forEach(d=>{if(d.prev){prevTotal+=d.prev;hasPrev=true}});
+      if(hasPrev){
+        const diff=total-prevTotal;
+        const pct=prevTotal?(diff/prevTotal*100):0;
+        delta={diff,pct,cls:diff>0?"pos":diff<0?"neg":"zero",arrow:diff>0?"↑":diff<0?"↓":"·"};
+        deltaHint="Приріст за період (сума поточних мінус сума попередніх значень)";
       }
     }
+    const totalHint=isTimeSeries?"Сума значень по періодах на графіку":"Сума по всіх категоріях";
 
     const box=h("div",{className:"cb"});
     const hd=h("div",{className:"cb-h"});
     const ctt=h("div",{className:"cb-tt"});
     ctt.append(h("div",{className:"cb-t"},cd.title));
     const meta=h("div",{className:"cb-meta"});
-    meta.append(h("div",{className:"cb-total"},fmt(total)));
-    if(delta){
-      const dl=h("div",{className:"cb-delta "+delta.cls});
-      if(delta.diff!==undefined){
-        dl.append(delta.arrow+" "+fmt(Math.abs(delta.diff))+(delta.pct?" · "+(delta.pct>0?"+":"")+delta.pct.toFixed(1)+"%":""));
-      }else{
-        dl.append(delta.arrow+" "+delta.txt);
-      }
+    const totalEl=h("div",{className:"cb-total",title:totalHint},fmt(total));
+    meta.append(totalEl);
+    if(delta&&delta.diff!==0){
+      const dl=h("div",{className:"cb-delta "+delta.cls,title:deltaHint});
+      dl.append(delta.arrow+" "+fmt(Math.abs(delta.diff))+(delta.pct?" · "+(delta.pct>0?"+":"")+delta.pct.toFixed(1)+"%":""));
       meta.append(dl);
     }
+    // Small label under total explaining what it is
+    const metricLabel=h("div",{className:"cb-metric-lbl"},isTimeSeries?"сума за період · тренд":"всього · vs минулий період");
     ctt.append(meta);
+    ctt.append(metricLabel);
     hd.append(ctt);
-    hd.append(h("div",{className:"cb-tag"},cd.type==="line"?"line":cd.type==="horizontal_bar"?"bar":"bar"));
     box.append(hd);
     const w=h("div",{className:"cb-w"});
     const cv=document.createElement("canvas");
