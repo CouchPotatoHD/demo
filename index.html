@@ -38,14 +38,27 @@
   .nb.p{border:none;color:#fff;font-weight:600}
   .nb.p:disabled{background:var(--card);color:rgba(255,255,255,0.15)}
 
-  /* Profile */
-  .prof{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:28px;text-align:center}
-  .prof img{width:100px;height:100px;border-radius:50%;border:3px solid rgba(255,255,255,0.15);background:#1e293b;object-fit:cover}
-  .prof h1{font-size:42px;font-weight:800;font-family:'Unbounded',sans-serif;letter-spacing:-1px}
-  .prof .sub{font-size:16px;color:var(--muted);margin-top:6px}
-  .prof .sts{display:flex;gap:48px;margin-top:12px}
-  .prof .sn{font-size:48px;font-weight:800;font-family:'Space Mono',monospace}
-  .prof .sl{font-size:12px;color:var(--muted);margin-top:2px}
+  /* Profile - Apple style */
+  .prof{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:0;text-align:center;position:relative}
+  .prof img{width:80px;height:80px;border-radius:50%;border:2px solid rgba(255,255,255,0.1);background:#1e293b;object-fit:cover}
+  .prof h1{font-size:38px;font-weight:800;font-family:'Unbounded',sans-serif;letter-spacing:-1px;margin-top:16px}
+  .prof .sub{font-size:14px;color:var(--muted);margin-top:4px}
+  .prof .period{font-size:12px;color:rgba(255,255,255,0.25);margin-top:8px;letter-spacing:2px;text-transform:uppercase}
+  .prof-steps{display:flex;flex-direction:column;align-items:center;gap:0;margin-top:32px;width:100%}
+  .prof-step{opacity:0;transform:translateY(20px);transition:all .5s ease;display:flex;align-items:center;justify-content:center;gap:32px;padding:16px 0;width:100%}
+  .prof-step.on{opacity:1;transform:translateY(0)}
+  .prof-card{text-align:center;min-width:160px}
+  .prof-card .num{font-size:56px;font-weight:800;font-family:'Space Mono',monospace;background:linear-gradient(135deg,#60A5FA,#818CF8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;line-height:1}
+  .prof-card .lbl{font-size:13px;color:var(--muted);margin-top:8px}
+  .prof-card .delta{font-size:14px;font-weight:700;margin-top:4px}
+  .prof-card .delta.pos{color:#059669}
+  .prof-card .delta.neg{color:#EF4444}
+  .prof-card .delta.zero{color:rgba(255,255,255,0.2)}
+  .prof-divider{width:1px;height:48px;background:rgba(255,255,255,0.08)}
+  .prof-cat{display:flex;gap:24px;align-items:center;justify-content:center}
+  .prof-cat-item{text-align:center;min-width:100px}
+  .prof-cat-item .cn{font-size:44px;font-weight:800;font-family:'Space Mono',monospace}
+  .prof-cat-item .cl{font-size:12px;color:var(--muted);margin-top:4px}
 
   /* Combined project */
   .pf{display:flex;flex-direction:column;height:100%;gap:10px;overflow:hidden}
@@ -119,10 +132,12 @@ async function loadData(){
     const buf=await r.arrayBuffer();document.getElementById("lb").style.width="40%";
     const wb=XLSX.read(buf,{type:"array"});
     const prof=rs(wb,"profile"),proj=rs(wb,"projects"),tasks=rs(wb,"tasks"),mets=rs(wb,"metrics"),plans=rs(wb,"plans");
+    let smRows=[];try{smRows=rs(wb,"summary")}catch(e){}
     let dbR=[],chR=[],cdR=[];try{dbR=rs(wb,"dashboards")}catch(e){}try{chR=rs(wb,"charts")}catch(e){}try{cdR=rs(wb,"chart_data")}catch(e){}
     document.getElementById("lb").style.width="70%";
     const pm={};prof.forEach(r=>pm[String(r.key)]=String(r.value));
-    CONFIG={password:pm.password||"",profile:{name:pm.name||"",role:pm.role||"",team:pm.team||"",avatar:pm.avatar||"avatar.png"},projects:[],dashboards:[]};
+    const sm={};smRows.forEach(r=>sm[String(r.key)]=r.value);
+    CONFIG={password:pm.password||"",profile:{name:pm.name||"",role:pm.role||"",team:pm.team||"",avatar:pm.avatar||"avatar.png"},summary:sm,projects:[],dashboards:[]};
     const tg={},mg={},pg={};
     tasks.forEach(r=>{const p=r.project_id,s=r.section;(tg[p]=tg[p]||{})[s]=(tg[p][s]||[]);tg[p][s].push({key:String(r.key),name:r.name,status:r.status,progress:parseInt(r.progress)||0})});
     mets.forEach(r=>{const p=r.project_id,s=r.section;(mg[p]=mg[p]||{})[s]=(mg[p][s]||[]);mg[p][s].push({label:r.label,value:parseInt(r.value)||0,sub:String(r.sub||"")})});
@@ -137,9 +152,35 @@ async function loadData(){
 }
 
 let slides=[],cur=0,ach=[];
-function buildSlides(){slides=[];const tc=CONFIG.projects.reduce((a,p)=>a+p.stats.completed,0);slides.push({type:"profile",tc,tp:CONFIG.projects.length});CONFIG.projects.forEach(p=>slides.push({type:"project",project:p}));CONFIG.dashboards.forEach(d=>slides.push({type:"dash",dashboard:d}))}
+function buildSlides(){slides=[];slides.push({type:"profile"});CONFIG.projects.forEach(p=>slides.push({type:"project",project:p}));CONFIG.dashboards.forEach(d=>slides.push({type:"dash",dashboard:d}))}
 
-function rProfile(s){const p=CONFIG.profile;return h("div",{className:"prof anim"},h("img",{src:p.avatar}),h("div",null,h("h1",null,p.name),h("div",{className:"sub"},p.role+" · "+p.team)),h("div",{className:"sts"},h("div",null,h("div",{className:"sn",style:{color:"#059669"}},""+s.tc),h("div",{className:"sl"},"задач виконано")),h("div",null,h("div",{className:"sn",style:{color:"#3B82F6"}},""+s.tp),h("div",{className:"sl"},"проєктів"))))}
+let profStep=0,profMax=0;
+function rProfile(s){
+  const p=CONFIG.profile,sm=CONFIG.summary||{};
+  const pFrom=sm.period_from||"",pTo=sm.period_to||"";
+  const tp=parseInt(sm.total_processes)||0,np=parseInt(sm.new_processes)||0;
+  const td=parseInt(sm.total_doc_types)||0,nd=parseInt(sm.new_doc_types)||0;
+  const db=parseInt(sm.done_business)||0,dt=parseInt(sm.done_tech)||0,wp=parseInt(sm.will_present)||0;
+  function dE(v){const c=v>0?"pos":v<0?"neg":"zero",t=v>0?"+"+v:v===0?"без змін":""+v;return h("div",{className:"delta "+c},t)}
+  const root=h("div",{className:"prof"});
+  root.append(h("img",{src:p.avatar,className:"anim"}));
+  root.append(h("h1",{className:"anim d1"},p.name));
+  root.append(h("div",{className:"sub anim d1"},p.role+" · "+p.team));
+  if(pFrom)root.append(h("div",{className:"period anim d2"},pFrom+" — "+pTo));
+  const stps=h("div",{className:"prof-steps"});
+  stps.append(h("div",{className:"prof-step"},h("div",{className:"prof-card"},h("div",{className:"num"},""+tp),h("div",{className:"lbl"},"процесів"),dE(np))));
+  stps.append(h("div",{className:"prof-step"},h("div",{className:"prof-card"},h("div",{className:"num"},""+td),h("div",{className:"lbl"},"типів документів"),dE(nd))));
+  stps.append(h("div",{className:"prof-step"},h("div",{className:"prof-cat"},
+    h("div",{className:"prof-cat-item"},h("div",{className:"cn",style:{color:"#F59E0B"}},""+db),h("div",{className:"cl"},"бізнес")),
+    h("div",{className:"prof-divider"}),
+    h("div",{className:"prof-cat-item"},h("div",{className:"cn",style:{color:"#818CF8"}},""+dt),h("div",{className:"cl"},"технічні")),
+    h("div",{className:"prof-divider"}),
+    h("div",{className:"prof-cat-item"},h("div",{className:"cn",style:{color:"#059669"}},""+wp),h("div",{className:"cl"},"розкажу"))
+  )));
+  root.append(stps);profMax=3;
+  requestAnimationFrame(()=>{stps.querySelectorAll(".prof-step").forEach((el,i)=>{if(i<profStep)el.classList.add("on")})});
+  return root;
+}
 
 function rProject(s){
   const p=s.project;
@@ -164,7 +205,7 @@ function rProject(s){
   p.sections.forEach(sec=>{
     const col=h("div",{className:"pf-col"});
     col.append(h("div",{className:"pf-ch"},sec.title));
-    if(sec.metrics&&sec.metrics.length){const mr=h("div",{className:"pf-mr"});sec.metrics.forEach(m=>{mr.append(h("div",{className:"pf-m"},h("div",{className:"pf-mv",style:{color:p.color}},fmt(m.value)),h("div",{className:"pf-ml"},m.label)))});col.append(mr)}
+    if(sec.metrics&&sec.metrics.length){const mr=h("div",{className:"pf-mr"});sec.metrics.forEach(m=>{const subEl=m.sub?h("div",{style:{fontSize:"11px",marginTop:"2px",color:m.sub.startsWith("+")&&m.sub!=="+0"?"#059669":m.sub.startsWith("-")?"#EF4444":"rgba(255,255,255,0.3)"}},m.sub):null;mr.append(h("div",{className:"pf-m"},h("div",{className:"pf-mv",style:{color:p.color}},fmt(m.value)),h("div",{className:"pf-ml"},m.label),subEl))});col.append(mr)}
     if(sec.tasks)sec.tasks.forEach(t=>{const c=(ST[t.status]||ST.todo).c;col.append(h("div",{className:"tr"},h("div",{className:"tr-d",style:{background:c}}),h("div",{style:{flex:"1",minWidth:"0"}},h("div",{className:"tr-n"},t.name),h("div",{className:"tr-k"},t.key))))});
     body.append(col);
   });
@@ -188,7 +229,7 @@ function mkch(cv,cd){
     options:{indexAxis:isH?"y":"x",responsive:true,maintainAspectRatio:false,
       plugins:{legend:{display:false},
         tooltip:{backgroundColor:"#1E293B",titleColor:"#fff",bodyColor:"#fff",callbacks:{label:ctx=>ctx.parsed[isH?'x':'y'].toLocaleString()}},
-        datalabels:{anchor:"end",align:"end",color:"rgba(255,255,255,0.7)",font:{size:9,weight:"bold",family:"'JetBrains Mono'"},
+        datalabels:{anchor:"end",align:"start",color:"rgba(255,255,255,0.85)",font:{size:9,weight:"bold",family:"'JetBrains Mono'"},
           formatter:function(val,ctx){
             const i=ctx.dataIndex,prev=pv[i];
             let s=fmt(val);
@@ -212,11 +253,17 @@ function rDash(s){
   root.append(g);return root;
 }
 
-function go(i){if(i<0||i>=slides.length)return;cur=i;render()}
+function go(i){
+  if(slides[cur].type==="profile"&&i>cur&&profStep<profMax){profStep++;const it=document.querySelectorAll(".prof-step");if(it[profStep-1])it[profStep-1].classList.add("on");return}
+  if(slides[cur].type==="profile"&&i<cur&&profStep>0){profStep--;const it=document.querySelectorAll(".prof-step");if(it[profStep])it[profStep].classList.remove("on");return}
+  if(i<0||i>=slides.length)return;if(slides[i].type==="profile"&&i!==cur)profStep=0;cur=i;render()
+}
 function render(){
   dch();const area=document.getElementById("area");area.innerHTML="";const s=slides[cur];
   let el;if(s.type==="profile")el=rProfile(s);else if(s.type==="project")el=rProject(s);else if(s.type==="dash")el=rDash(s);
   if(el)area.append(el);
+  document.getElementById("av").style.display=s.type==="profile"?"none":"";
+  document.getElementById("nm").style.display=s.type==="profile"?"none":"";
   const dots=document.getElementById("dots");dots.innerHTML="";const ac=s.project?s.project.color:s.dashboard?"#4F7CFF":"#059669";
   slides.forEach((_,i)=>{const d=h("button",{className:"dot"+(i===cur?" active":"")});if(i===cur)d.style.background=ac;d.onclick=()=>go(i);dots.append(d)});
   document.getElementById("cnt").textContent=(cur+1)+" / "+slides.length;
